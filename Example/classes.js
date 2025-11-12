@@ -66,3 +66,33 @@ class ElectricCar extends Car {
 const myEV = new ElectricCar("Tesla", "Model S", 2024, 396);
 myEV.displayInfo(); // from Car
 myEV.charge();      // from ElectricCar
+
+//ANCHOR Lists
+let tasks = ['task1', 'task2'];
+
+// Append
+tasks.push('task3');
+tasks.push('task4');
+console.log(tasks); // ['task1', 'task2', 'task3', 'task4']
+
+// Remove last
+tasks.pop();
+console.log(tasks); // ['task1', 'task2', 'task3']
+
+// Remove at index 1
+tasks.splice(1, 1);
+console.log(tasks); // ['task1', 'task3']
+
+
+
+//SAFE REMOVAL
+function removeAtIndex(arr, index) {
+    if (index >= 0 && index < arr.length) {
+        return arr.filter((_, i) => i !== index);
+    }
+    return arr;
+}
+
+let data = [1, 2, 3, 4];
+data = removeAtIndex(data, 1);
+console.log(data); // [1, 3, 4]

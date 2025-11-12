@@ -4,7 +4,6 @@ class ports {
         ePow = e;
         rPow = r;
         iox = io;
-        
     }
 
     getEPower() {
@@ -96,6 +95,23 @@ class redstone {
 }
 //!SECTION
 
+
+//SECTION Update/Analysis
+//strBlocks = 2D array of blocks in string format
+
+var blocks = [] //converting blocks to objects
+
+function update(strBlocks){
+    for(let rows = 0; rows < strBlocks.length; rows++){ //go through the rows of blocks
+        for (let columns = 0; columns < strBlocks[0].length; columns++){ //go through the individual columns
+            for (let portIndex = 0; portIndex < 4; portIndex++){ //for every single one of these blocks, check surrounding
+
+            }
+        }
+    }
+}
+
+//!SECTION
 
 
 //SECTION API
@@ -239,7 +255,7 @@ Variables/Parameters (redstone-dust):
     ]
 ]
 
-//NOTE Iox list extended
+//NOTE Io list extended
 [ 
     [
         [ 
