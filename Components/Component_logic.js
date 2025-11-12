@@ -1,9 +1,9 @@
-//Ports
+//SECTION Ports
 class ports {
-    constructor(e, r, iox){
+    constructor(e, r, io){
         ePow = e;
         rPow = r;
-        io = iox;
+        iox = io;
         
     }
 
@@ -16,19 +16,20 @@ class ports {
     }
 
     getType() {
-        return io[0]; //string
+        return iox[0]; //string
     }
 
     getPrior() {
         //priority = redirection
-        return io[1]; //boolean
+        return iox[1]; //boolean
     }
 
 }
+//!SECTION
 
-
-//Redstone dust (main/basic structure)
+//SECTION Redstone dust (main/basic structure)
 class redstone {
+    //NOTE Attributes list
     /*Attributes:
         - Input count
         - Output count
@@ -80,9 +81,7 @@ class redstone {
 
     //determines directions of output and inputs
     direction() {
-        if (this.powerCheck()){
-            
-        }
+        
     }
 
     //Runs a test on the block
@@ -95,12 +94,13 @@ class redstone {
     }
     
 }
+//!SECTION
 
+
+
+//SECTION API
 /*
-
-
-
-
+//ANCHOR Basic Notes (Pt.1)
 
 - Power = redstone signals
 - Electricity = actual power
@@ -111,6 +111,7 @@ class redstone {
 - translated into a list of objects
     - Each block is an object that holds the connections
 -------------------------------------------------------------------------------
+//ANCHOR Basic Notes (Pt.2)
 
 General:
 - Input
@@ -125,6 +126,7 @@ General:
     - calculated power
 
 -------------------------------------------------------------------------------
+//ANCHOR Hierarchy & Typing
 
 Variables/Parameters (ports):
 *ePower - boolean
@@ -140,7 +142,7 @@ Variables/Parameters (ports):
     - Type - string
         - "input" - input port
         - "output" - output port
-        - "none" - empty port
+        - "none" - empty port (can refer to empty block or wall)
 
     - Priority(output ports) - boolean
         - true - priority connection 
@@ -170,15 +172,120 @@ Variables/Parameters (redstone-dust):
         - "bottom" - bottom port (bottom)
 
 -------------------------------------------------------------------------------
+//SECTION Array structure (2d & 5d):
 
-Array structure (4d):
-- block object
-- connections
+//NOTE [2D] blocks
+[
+    row (list)
+]
 
-[["redstone_dust","empty","empty"],["redstone_dust","empty","empty"],["redstone_dust","empty","empty"]]
+//NOTE [1D] blocks
+[
+    [
+        block (string)
+    ]
+]
+
+--------------------------------------------(SPLIT)
+//NOTE translation to objects rows
+[
+    row (list)
+]
+
+//NOTE translation to objects
+[
+    [
+        block (object)
+    ]
+]
+
+//NOTE translation individual ports
+[ 
+    [
+        [
+            port_1 (object),
+            port_2 (object),
+            port_3 (object),
+            port_4 (object)
+        ]
+    ]
+]
+
+//NOTE data of individual ports
+[ 
+    [
+        [ 
+            [
+                e (integer),
+                r (integer),
+                io (list)
+            ],
+            [
+                e (integer),
+                r (integer),
+                io (list)
+            ],
+            [
+                e (integer),
+                r (integer),
+                io (list)
+            ],
+            [
+                e (integer),
+                r (integer),
+                io (list)
+            ]
+        ]
+    ]
+]
+
+//NOTE Iox list extended
+[ 
+    [
+        [ 
+            [
+                e (integer),
+                r (integer),
+                [
+                    type (string),
+                    priority (boolean)
+                ]
+            ],
+            [
+                e (integer),
+                r (integer),
+                [
+                    type (string),
+                    priority (boolean)
+                ]
+            ],
+            [
+                e (integer),
+                r (integer),
+                [
+                    type (string),
+                    priority (boolean)
+                ]
+            ],
+            [
+                e (integer),
+                r (integer),
+                [
+                    type (string),
+                    priority (boolean)
+                ]
+            ]
+        ]
+        - ADDING MORE BLOCKS (AND THEIR PORTS)
+    ]
+    - ADDING MORE ROWS (AND THEIR BLOCKS)
+]
+
+//!SECTION
+
 -------------------------------------------------------------------------------
 
-Procedure loop:
+//ANCHOR Procedure loop:
 > extract 2D list from grid
 > translate all blocks to a list of objects
 > analyze list of objects
@@ -190,6 +297,6 @@ Procedure loop:
 - Note, this will make the redstone travel +1 for every update
 - A block being powered cannot power the block being powered
 
-
-
 */
+//!SECTION
+
