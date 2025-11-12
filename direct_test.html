@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Direct Input Test</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #4b8e9a;
+                color: white;
+                text-align: center;
+                padding: 20px;
+            }
+            input {
+                background-color: #333;
+                border: 1px solid #555;
+                color: white;
+                padding: 10px;
+                margin: 5px;
+                border-radius: 5px;
+            }
+            button {
+                background-color: #545c78;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            p {
+                margin-top: 20px;
+                background-color: white;
+                color: black;
+                padding: 10px;
+                border-radius: 5px;
+            }
+        </style>
+        <script type="text/javascript" src="Component_logic.js"></script>
+    </head>
+    <body>
+        <input type="text" id="northInput" placeholder="North...">
+        <input type="text" id="northPriority" placeholder="North Priority...">
+        <br>
+        <input type="text" id="eastInput" placeholder="East...">
+        <input type="text" id="eastPriority" placeholder="East Priority...">
+        <br>
+        <input type="text" id="southInput" placeholder="South...">
+        <input type="text" id="southPriority" placeholder="South Priority...">
+        <br>
+        <input type="text" id="westInput" placeholder="West...">
+        <input type="text" id="westPriority" placeholder="West Priority...">
+        <br>
+
+        <button id="application">Apply selection</button>
+        <p><br><br><br><br></p>
+    </body>
+</html>
