@@ -26,8 +26,8 @@ class componentPort {
 }
 //!SECTION
 
-//SECTION Redstone dust (main/basic structure)
-class redstone {
+//SECTION Block main structure
+class blocks {
         constructor(portList){
         this.ports = portList;
         // [north, east, south, west] (objects)
@@ -114,19 +114,30 @@ class redstone {
 
 
 //SECTION Update/Analysis
-//strBlocks = 2D array of blocks in string format
+var str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
 
-var blocks = [] //converting blocks to objects
+//REVIEW establish 6x6 array of block objects for blocksV1
+var blocksV1 = []; //converting blocks to objects
+var blocksV2 = blocksV1; //updated values of blocks
 
-function update(strBlocks){
+//analyzes and updates grid with redstone
+function analysis(){
     for(let rows = 0; rows < strBlocks.length; rows++){ //go through the rows of blocks
         for (let columns = 0; columns < strBlocks[0].length; columns++){ //go through the individual columns
-            for (let portIndex = 0; portIndex < 4; portIndex++){ //for every single one of these blocks, check surrounding
-                //here
-                
-            }
+            //currently accessing individual blocks, use block methods to access and analyze individual ports
         }
     }
+}
+
+//updates the str of blocks (only)
+function updateStr(x,y,block){
+    str[x][y] = block;
+}
+
+//clears the str list and updates grid
+//REVIEW Add the code that updates the grid (document.getElementById() stuff)
+function clearGrid(){
+    str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
 }
 
 //!SECTION
@@ -249,7 +260,7 @@ Variables/Parameters (redstone-dust):
 //NOTE data of individual ports
 [ 
     [
-        [ 
+        [ (BLOCKS - can individually access all info below)
             [
                 e (integer),
                 r (integer),
