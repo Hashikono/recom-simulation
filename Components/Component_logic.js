@@ -1,5 +1,5 @@
 //SECTION Ports
-class ports {
+class componentPort {
     constructor(e, r, io){
         ePow = e;
         rPow = r;
@@ -28,28 +28,17 @@ class ports {
 
 //SECTION Redstone dust (main/basic structure)
 class redstone {
-    //NOTE Attributes list
-    /*Attributes:
-        - Input count
-        - Output count
-        - x4 e power (exclusive to simulation)
-        - x4 r power
-        - x4 io
-            - type
-            - priority
-    */
-
-    constructor(directions){
-        this.directions = directions;
-        // [north, east, south, west]
+        constructor(portList){
+        this.ports = portList;
+        // [north, east, south, west] (objects)
         this.inputCount = 0;
         this.outputCount = 0;
 
         //establish io count
-        for (let i = 0; i < directions.length; i++){
-            if (directions[i] == "input"){
+        for (let i = 0; i < this.ports.length; i++){
+            if (this.ports[i] == "input"){
                 this.inputCount++;
-            } else if (directions[i] == "output"){
+            } else if (this.ports[i] == "output"){
                 this.outputCount++;
             }
         }
@@ -67,26 +56,54 @@ class redstone {
         }
     }
 
-    //power level output from max power input
-    powerOutput(){
-        var max = directions[0];
-        for (let i = 1; i < this.directions.length; i++){
-            if (directions[i].ePower() > max){
-                max = directions[i].ePower();
+    //returns highest redstone power input value
+    maxPowerOutput(){
+        let max = 0;
+        for (let i = 0; i < this.ports.length; i++){
+            if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
+                max = ports[i].rPower();
             }
         }
         return max;
     }
+    
 
-    //determines directions of output and inputs
-    direction() {
+    //determines directions of outputs as a list of things to output on
+    determineOutputs() {
+        //list of output/port indexes
+        let outputList = [];
+        //check for priority existence
+        let priorityExist = false;
+        //logs the ports with priority for analysis only
+        let priorityList = [];
+        //analyzing priority effect on output implementation (merely for console-logging)
+        let outputAllowance = ["north","east","south","west"];
+
+        for (let i = 0; i < this.ports.length; i++){
+            //checks if priority exists
+            if (this.ports[i].getPrior()){
+                priorityExist = true;
+                priorityList.push(i);
+            }
+        }
         
+        if (priorityExist){ //priority exists
+            if (priorityList.length == 1){ //only one priority
+
+            } else { //more than 1 priority
+            
+            }
+        } else { //priority doesn't exist
+            
+        }
+        //allowed ports
+        console.log(`Allowed ports: ${outputAllowance}`);
+        return outputList;
     }
 
-    //Runs a test on the block
+    //Runs an io test on the block
     test() {
         if (this.powerCheck()){
-            this.powerOutput();
 
         }
         console.log("This block does not have any power")
@@ -105,7 +122,8 @@ function update(strBlocks){
     for(let rows = 0; rows < strBlocks.length; rows++){ //go through the rows of blocks
         for (let columns = 0; columns < strBlocks[0].length; columns++){ //go through the individual columns
             for (let portIndex = 0; portIndex < 4; portIndex++){ //for every single one of these blocks, check surrounding
-
+                //here
+                
             }
         }
     }
@@ -167,6 +185,7 @@ Variables/Parameters (ports):
 - io examples:
     - Input 0 : powered cobblestone
     - Input 1 : redstone block, repeator (from output side), redstone dust, etc.
+        - the redstone (dust) will recieve the power either way, priority only affects the direction of output
     - Output 0 : redstone lamps, chest(cannot emit redstone but exists), cobblestone
     - Output 1 : pistons, repeators (to input side), etc.
     - Empty 0 : Not connected to anything (air block)
@@ -190,12 +209,12 @@ Variables/Parameters (redstone-dust):
 -------------------------------------------------------------------------------
 //SECTION Array structure (2d & 5d):
 
-//NOTE [2D] blocks
+//NOTE [1D] blocks
 [
     row (list)
 ]
 
-//NOTE [1D] blocks
+//NOTE [2D] blocks
 [
     [
         block (string)
@@ -215,7 +234,7 @@ Variables/Parameters (redstone-dust):
     ]
 ]
 
-//NOTE translation individual ports
+//NOTE translation individual ports/directions
 [ 
     [
         [
