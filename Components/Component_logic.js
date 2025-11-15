@@ -1,5 +1,5 @@
 //SECTION Ports
-class componentPort {
+class ComponentPort {
     constructor(e, r, io){
         ePow = e;
         rPow = r;
@@ -27,7 +27,7 @@ class componentPort {
 //!SECTION
 
 //SECTION Block main structure
-class blocks {
+class Block {
         constructor(portList){
         this.ports = portList;
         // [north, east, south, west] (objects)
@@ -114,17 +114,27 @@ class blocks {
 
 
 //SECTION Update/Analysis
+//stores all blocks as strings
 var str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
 
-//REVIEW establish 6x6 array of block objects for blocksV1
-var blocksV1 = []; //converting blocks to objects
-var blocksV2 = blocksV1; //updated values of blocks
+//generix empty block
+var x = new Block(new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false));
+//converting blocks to objects
+var blocksV1 = [[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x]];
+//updated values of blocks
+var blocksV2 = blocksV1;
 
-//analyzes and updates grid with redstone
-function analysis(){
-    for(let rows = 0; rows < strBlocks.length; rows++){ //go through the rows of blocks
-        for (let columns = 0; columns < strBlocks[0].length; columns++){ //go through the individual columns
-            //currently accessing individual blocks, use block methods to access and analyze individual ports
+//converts the grid into objects
+function conversion(){
+    for(let r = 0; r < str.length; r++){ //go through the rows of blocks
+        for (let c = 0; c < str[0].length; c++){ //go through the individual columns
+            if (str[c] == "empty"){
+                /*
+                HERE
+                */
+            } else if (str[c] == "redstone_dust"){
+
+            }
         }
     }
 }
@@ -169,6 +179,14 @@ General:
 
 - Output (with priority)
     - calculated power
+
+- Block string values
+    - cobblestone
+    - redstone_dust
+    - redstone_repeator
+    - redstone_comparator
+    - 
+
 
 -------------------------------------------------------------------------------
 //ANCHOR Hierarchy & Typing
@@ -342,7 +360,6 @@ Variables/Parameters (redstone-dust):
 
 - Note, this will make the redstone travel +1 for every update
 - A block being powered cannot power the block being powered
-
 */
 //!SECTION
 
