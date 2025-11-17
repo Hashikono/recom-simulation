@@ -1,8 +1,11 @@
 //SECTION Ports
 class ComponentPort {
     constructor(e, r, io){
+        //Electric power
         ePow = e;
+        //Redstone power
         rPow = r;
+        //i/o list
         iox = io;
     }
 
@@ -26,8 +29,9 @@ class ComponentPort {
 }
 //!SECTION
 
-//SECTION Block main structure
+//SECTION Block main structure (applies exclusively to dust)
 class Block {
+        //REVIEW Is i/o count necessary?? (cause if it's not an input, it's an output, regardless of being empty)
         constructor(portList){
         this.ports = portList;
         // [north, east, south, west] (objects)
@@ -114,18 +118,37 @@ class Block {
 
 
 //SECTION Update/Analysis
-//stores all blocks as strings
-var str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
+/*DEPRECATED: stores all blocks as strings (with their attributes) - Don't need to anymore cause direct object conversion is possible
+var str = [];
+function stringConversion(){
+    for (let r = 0; r < 6; r++){
+        for (let c = 0; c < 6; c++){
+            //get the elements in teh grid by their data set and create 
+        }
+    }
+}
+//clears the str list and updates grid
+function clearGrid(){
+    str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
+}
+*/
 
-//generix empty block
-var x = new Block(new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false));
+//generic empty block generator
+function genEmptyBlock(){
+    return new Block(new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false));
+}
+
+//generic blocks version
+const blocksV0 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 //converting blocks to objects
-var blocksV1 = [[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x],[x,x,x,x,x,x]];
-//updated values of blocks
-var blocksV2 = blocksV1;
+var blocksObj = blocksV0;
 
-//converts the grid into objects
+//ONLY converts the grid into an objects list
 function conversion(){
+    //version one of blocks
+    let blocksV1 = blocksObj;
+    //version two of blocks (actively constructing)
+    let blocksV2 = [];
     for(let r = 0; r < str.length; r++){ //go through the rows of blocks
         for (let c = 0; c < str[0].length; c++){ //go through the individual columns
             if (str[c] == "empty"){
@@ -137,22 +160,19 @@ function conversion(){
             }
         }
     }
+    blocksObj = blocksV2;
+    //no return statement...already accessible in blocksObj
 }
 
-//updates the str of blocks (only)
+//updates the str of blocks (concerns versions)
 function updateStr(x,y,block){
     str[x][y] = block;
 }
 
-//clears the str list and updates grid
-//REVIEW Add the code that updates the grid (document.getElementById() stuff)
-function clearGrid(){
-    str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
-}
 
 //!SECTION
 
-
+//REVIEW ORGANIZE NOTES BELOW   
 //SECTION API
 /*
 //ANCHOR Basic Notes (Pt.1)
@@ -165,9 +185,16 @@ function clearGrid(){
 - The grid will give a list for the blocks
 - translated into a list of objects
     - Each block is an object that holds the connections
+- The HTMl page will actually store all attrbutes of a given block (only way to actively store it in the html page)
+    - this is because of the annoying rality that the user updates the grid THEMSELVES
+
+SPECIAL CASES:
+- Redstone blocks have an rpower of 16
+    - block next to it wil output 15 (x-1)
+- repeators have an rpower of 17
+    - blocks that detect 17 will output 15 (x-2)
 -------------------------------------------------------------------------------
 //ANCHOR Basic Notes (Pt.2)
-
 General:
 - Input
     - Electric (e) power (only to simulate detecting power)
@@ -185,9 +212,23 @@ General:
     - redstone_dust
     - redstone_repeator
     - redstone_comparator
-    - 
 
+Directions:
+- numbers will be in value order (24,34,13,etc.) [ONLY DUST]
+    - repeators etc. will start with the side of the input and then output (ex. 42)
+- in images, they represents both inputs and outputs available 
+    - the code will determine what is an input/output
+    - IMAGE STRUCTURE: (block name)_(state [starts at 1])_(power)_(direction).png
+        - every block will process this semi-uniquely
 
+        1
+    4   +   2
+        3
+---------------------
+        N
+    W   +   E
+        S
+        
 -------------------------------------------------------------------------------
 //ANCHOR Hierarchy & Typing
 
