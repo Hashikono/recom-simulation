@@ -20,7 +20,7 @@ class ComponentPort {
     }
 
     getType(){
-        return typ;
+        return typ; //string
     }
 
     getState() {
@@ -31,7 +31,6 @@ class ComponentPort {
         //priority = redirection
         return iox[1]; //boolean
     }
-
 }
 //!SECTION
 
@@ -42,7 +41,7 @@ class Block {
         // [north, east, south, west] (objects)
 
         //AS OF NOW, I/O COUNT IS DEPRECATED
-
+        /*
         this.inputCount = 0;
         this.outputCount = 0;
 
@@ -55,6 +54,7 @@ class Block {
             }
         }
         console.log(`Inputs: ${this.inputCount} | Outputs: ${this.outputCount}`);
+        */
     }
 
     //checks if power exists before any computations
@@ -147,7 +147,7 @@ function updateStr(x,y,block){
 
 //generic empty block generator
 function genEmptyBlock(){
-    return new Block(new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false), new ComponentPort(false, 0, "empty", false));
+    return new Block([new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false])]);
 }
 
 //generic blocks version
@@ -254,7 +254,6 @@ Variables/Parameters (ports):
     - Type - string
         - "input" - input port
         - "output" - output port
-        - "none" - empty port (can refer to empty block or wall)
 
     - Priority(output ports) - boolean
         - true - priority connection 
@@ -272,6 +271,21 @@ Variables/Parameters (ports):
 - tentative blocks
     - redstone dust (always has priority)
     - cobble stone (never has priority)
+
+//NOTE list of block types
+- Blocks:
+    - redstone_block
+    - redstone_dust
+    - redstone_repeator
+    - redstone_comparator
+    - redstone_lamp
+    - oak_button
+    - note_block
+    - lever
+    - observer
+    - cobblestone
+    - air
+    
 
 Variables/Parameters (redstone-dust):
 *connection - object_list[north, east, south, west]
