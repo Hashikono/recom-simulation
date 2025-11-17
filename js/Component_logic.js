@@ -1,10 +1,12 @@
 //SECTION Ports
 class ComponentPort {
-    constructor(e, r, io){
+    constructor(e, r, type, io){
         //Electric power
         ePow = e;
         //Redstone power
         rPow = r;
+        //block type;
+        typ = type;
         //i/o list
         iox = io;
     }
@@ -17,7 +19,11 @@ class ComponentPort {
         return rPow; //integer
     }
 
-    getType() {
+    getType(){
+        return typ;
+    }
+
+    getState() {
         return iox[0]; //string
     }
 
@@ -31,10 +37,12 @@ class ComponentPort {
 
 //SECTION Block main structure (applies exclusively to dust)
 class Block {
-        //REVIEW Is i/o count necessary?? (cause if it's not an input, it's an output, regardless of being empty)
         constructor(portList){
         this.ports = portList;
         // [north, east, south, west] (objects)
+
+        //AS OF NOW, I/O COUNT IS DEPRECATED
+
         this.inputCount = 0;
         this.outputCount = 0;
 
@@ -131,6 +139,10 @@ function stringConversion(){
 function clearGrid(){
     str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
 }
+//updates the str of blocks (concerns versions)
+function updateStr(x,y,block){
+    str[x][y] = block;
+}
 */
 
 //generic empty block generator
@@ -164,10 +176,6 @@ function conversion(){
     //no return statement...already accessible in blocksObj
 }
 
-//updates the str of blocks (concerns versions)
-function updateStr(x,y,block){
-    str[x][y] = block;
-}
 
 
 //!SECTION
