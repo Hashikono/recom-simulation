@@ -177,57 +177,39 @@ function conversion(){
 }
 
 
-
 //!SECTION
 
-//REVIEW ORGANIZE NOTES BELOW   
-//SECTION API
-/*
-//ANCHOR Basic Notes (Pt.1)
 
+/*
+//SECTION API
+-----------------------------------------------------------------------------------------
+//ANCHOR Notes:
+
+General:
 - Power = redstone signals
-- Electricity = actual power
+- Electricity = actual power (simulation only)
 - you have to check all sides of the redstone dust
-- redstone dust is composed of 4 ports, the dust itself is the processor that 
-  determines what to output...
-- The grid will give a list for the blocks
+    - redstone dust is composed of 4 ports, the dust itself is the processor that 
+      determines what to output...
+
+Translation:
 - translated into a list of objects
     - Each block is an object that holds the connections
 - The HTMl page will actually store all attrbutes of a given block (only way to actively store it in the html page)
-    - this is because of the annoying rality that the user updates the grid THEMSELVES
+    - this is because of the annoying reality that the user updates the grid THEMSELVES
 
-SPECIAL CASES:
+Special case:
 - Redstone blocks have an rpower of 16
-    - block next to it wil output 15 (x-1)
-- repeators have an rpower of 17
-    - blocks that detect 17 will output 15 (x-2)
--------------------------------------------------------------------------------
-//ANCHOR Basic Notes (Pt.2)
-General:
-- Input
-    - Electric (e) power (only to simulate detecting power)
-    - Redstone (r) power (minus 1)
-    - connection (direction-ish)
-        - A B C D
-    - Are the blocks surrounding recievers or transmitter (i/o)
-        - reciever priority
-
-- Output (with priority)
-    - calculated power
-
-- Block string values
-    - cobblestone
-    - redstone_dust
-    - redstone_repeator
-    - redstone_comparator
+    - block next to it will be inputted a 16 then output 15 (x-1)
 
 Directions:
 - numbers will be in value order (24,34,13,etc.) [ONLY DUST]
     - repeators etc. will start with the side of the input and then output (ex. 42)
 - in images, they represents both inputs and outputs available 
     - the code will determine what is an input/output
-    - IMAGE STRUCTURE: (block name)_(state [starts at 1])_(power)_(direction).png
-        - every block will process this semi-uniquely
+- IMAGE STRUCTURE: (block name)_(state [starts at 1])_(power)_(direction).png
+    - every block will process this semi-uniquely
+
 
         1
     4   +   2
@@ -237,7 +219,19 @@ Directions:
     W   +   E
         S
         
--------------------------------------------------------------------------------
+        
+Procedure loop:
+> extract 2D list from grid
+> translate all blocks to a list of objects
+> analyze list of objects
+    > All blocks check surrounding in version 1
+    > If the block powering the current block was ON in version 1
+    
+> implement updates to blocks
+
+- Note, this will make the redstone travel -1 for every update
+- A block being powered cannot power the block being powered
+-----------------------------------------------------------------------------------------
 //ANCHOR Hierarchy & Typing
 
 Variables/Parameters (ports):
@@ -259,6 +253,9 @@ Variables/Parameters (ports):
         - true - priority connection 
         - false - no priority or empty port
 
+-----------------------------------------------------------------------------------------
+//ANCHOR Data storage (examples)
+
 - io examples:
     - Input 0 : powered cobblestone
     - Input 1 : redstone block, repeator (from output side), redstone dust, etc.
@@ -268,9 +265,6 @@ Variables/Parameters (ports):
     - Empty 0 : Not connected to anything (air block)
     - Empty 1 : Doesn't exist
 
-- tentative blocks
-    - redstone dust (always has priority)
-    - cobble stone (never has priority)
 
 //NOTE list of block types
 - Blocks:
@@ -287,18 +281,8 @@ Variables/Parameters (ports):
     - air
     
 
-Variables/Parameters (redstone-dust):
-*connection - object_list[north, east, south, west]
-    - north - north port (front)
-    - east - east port (right)
-    - south - south port (back)
-    - west - west port (left)
-
-    later:
-        - "top" - top port (top)
-        - "bottom" - bottom port (bottom)
-
--------------------------------------------------------------------------------
+//!SECTION
+-----------------------------------------------------------------------------------------
 //SECTION Array structure (2d & 5d):
 
 //NOTE [1D] blocks
@@ -313,7 +297,7 @@ Variables/Parameters (redstone-dust):
     ]
 ]
 
---------------------------------------------(SPLIT)
+---------------------------------------------(SPLIT)
 //NOTE translation to objects rows
 [
     row (list)
@@ -345,21 +329,25 @@ Variables/Parameters (redstone-dust):
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 io (list)
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 io (list)
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 io (list)
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 io (list)
             ]
         ]
@@ -373,32 +361,36 @@ Variables/Parameters (redstone-dust):
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 [
-                    type (string),
+                    state (string),
                     priority (boolean)
                 ]
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 [
-                    type (string),
+                    state (string),
                     priority (boolean)
                 ]
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 [
-                    type (string),
+                    state (string),
                     priority (boolean)
                 ]
             ],
             [
                 e (integer),
                 r (integer),
+                typ (string),
                 [
-                    type (string),
+                    state (string),
                     priority (boolean)
                 ]
             ]
@@ -409,20 +401,6 @@ Variables/Parameters (redstone-dust):
 ]
 
 //!SECTION
-
--------------------------------------------------------------------------------
-
-//ANCHOR Procedure loop:
-> extract 2D list from grid
-> translate all blocks to a list of objects
-> analyze list of objects
-    > All blocks check surrounding in version 1
-    > If the block powering the current block was ON in version 1
-    
-> implement updates to blocks
-
-- Note, this will make the redstone travel +1 for every update
-- A block being powered cannot power the block being powered
+-----------------------------------------------------------------------------------------
 */
-//!SECTION
 
