@@ -1,0 +1,156 @@
+/*//REVIEW Customize the CSS to match the class*/
+    body {
+        font-family: 'Courier New', monospace;
+        background-color: #75adda;
+        color: rgb(0, 0, 0);
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    h1 {
+        color: #8c8c8c;
+        margin-bottom: 30px;
+    }
+    
+    .block-palette {
+        /*
+        - This is where the magic happens for the block selection area:
+        - display: grid: Turns this container into a CSS Grid container
+        - grid-template-columns: repeat(6, 50px): Creates 6 equal columns, each 50px wide
+        - repeat(6, 50px) means "create 6 columns, each 50px wide"
+        - gap: 10px: Adds 10px spacing between each grid cell
+        - justify-content: center: Centers the entire grid horizontally within its container
+        - margin-bottom: 30px: Adds space below the palette before the building grid
+        - background-color: #2a2a2a: Slightly lighter dark background for contrast
+        - border-radius: 10px: Rounded corners for modern look
+        - Result: A 6-column grid where blocks automatically wrap to new rows as needed.
+        */
+        display: grid;
+        grid-template-columns: repeat(6, 50px);
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #2a2a2a;
+        border-radius: 10px;
+    }
+    
+    .block {
+        /*
+        - width/height: 50px: Makes each block square, matching the grid column width
+        - border: 2px solid transparent: Invisible border that becomes visible when selected
+        - border-radius: 5px: Slightly rounded block corners
+        - cursor: pointer: Changes mouse to hand cursor on hover
+        - transition: all 0.2s ease: Smooth animations for hover/selection effects
+        */
+        width: 50px;
+        height: 50px;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .block:hover {
+        transform: scale(1.1);
+        border-color: #fff;
+    }
+    
+    .block.selected {
+        /*
+        - border-color: #55ff55: Green border for selected state (Minecraft green)
+        - border-width: 3px: Thicker border for emphasis
+        - transform: scale(1.1): Keeps the enlarged size
+        - box-shadow: 0 0 10px #55ff55: Green glow effect around selected block
+        */
+        border-color: #55ff55;
+        border-width: 3px;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #55ff55;
+    }
+    
+    .grid-container {
+        /*
+        - This creates the main 6x6 building grid:
+        - display: grid: CSS Grid container
+        - grid-template-columns: repeat(6, 60px): 6 columns, each 60px wide
+        - grid-template-rows: repeat(6, 60px): 6 rows, each 60px tall
+        - gap: 5px: 5px spacing between grid cells
+        - justify-content: center: Centers the grid horizontally
+        - Result: A perfect 6x6 grid where each cell is exactly positioned by row and column.
+        */
+        display: grid;
+        grid-template-columns: repeat(6, 60px);
+        grid-template-rows: repeat(6, 60px);
+        gap: 5px;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    
+    .grid-cell {
+        /*
+        - width/height: 60px: Matches the grid template dimensions
+        - background-color: #3a3a3a: Default empty cell color
+        - border: 2px solid #555: Visible grid lines between cells
+        - border-radius: 3px: Slight rounding for modern look
+        - cursor: pointer: Clickable indication
+        - transition: Smooth color changes
+        */
+        width: 60px;
+        height: 60px;
+        background-color: #3a3a3a;
+        border: 2px solid #555;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .grid-cell:hover {
+        background-color: #4a4a4a;
+        border-color: #777;
+    }
+    
+    .controls {
+        /*
+        
+        */
+        margin: 20px 0;
+    }
+    
+    button {
+        background-color: #55ff55;
+        color: #1a1a1a;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s ease;
+    }
+    
+    button:hover {
+        background-color: #44ee44;
+    }
+    
+    .array-display {
+        /*
+        - font-family: 'Courier New': Monospace font for code display
+        - text-align: left: Aligns code to the left for readability
+        - max-height: 200px: Limits height with scrollbar for long content
+        - overflow-y: auto: Adds scrollbar when content overflows
+        */
+        background-color: #2a2a2a;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-family: 'Courier New', monospace;
+        text-align: left;
+        max-height: 200px;
+        overflow-y: auto;
+    }

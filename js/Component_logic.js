@@ -183,7 +183,7 @@ function conversion(){
 /*
 //SECTION API
 -----------------------------------------------------------------------------------------
-//ANCHOR Notes:
+//NOTE Notes:
 
 General:
 - Power = redstone signals
@@ -232,7 +232,7 @@ Procedure loop:
 - Note, this will make the redstone travel -1 for every update
 - A block being powered cannot power the block being powered
 -----------------------------------------------------------------------------------------
-//ANCHOR Hierarchy & Typing
+//NOTE Hierarchy & Typing
 
 Variables/Parameters (ports):
 *ePower - boolean
@@ -254,7 +254,7 @@ Variables/Parameters (ports):
         - false - no priority or empty port
 
 -----------------------------------------------------------------------------------------
-//ANCHOR Data storage (examples)
+//NOTE Data storage (examples)
 
 - io examples:
     - Input 0 : powered cobblestone
