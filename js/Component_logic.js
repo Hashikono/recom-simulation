@@ -34,11 +34,12 @@ class ComponentPort {
 }
 //!SECTION
 
+
 //SECTION Block main structure (applies exclusively to dust)
 class Block {
         constructor(portList){
         this.ports = portList;
-        // [north, east, south, west] (objects)
+        /* [north, east, south, west] (objects)
 
         //AS OF NOW, I/O COUNT IS DEPRECATED
         /*
@@ -81,6 +82,28 @@ class Block {
     
 
     //determines directions of outputs as a list of things to output on
+    /*Ref: getEPower(boolean) | getRPower(integer) | getType(string) | getState(string) | getPrior(boolean)
+    <div 
+        class = "grid-cell"
+        id="cell-0-0" 
+        data-row = "0"  COORDINATE
+        data-col = "0"  COORDINATE
+        blockType = "redstone_dust"  LITERAL BLOCK
+
+        northPort = "false, 0, "empty", ["output", false]"
+        eastPort = "false, 0, "empty", ["output", false]"
+        southPort = "false, 0, "empty", ["output", false]"
+        westPort = "false, 0, "empty", ["output", false]"
+
+        <img 
+            src = "images/redstone_dust_off_1234.png"
+            alt = "images/redstone_dust_off_1234.png"
+        >
+    </div>
+    
+    Method: Each port string to array -> each array to 2d array
+
+    */
     determineOutputs() {
         //list of output/port indexes
         let outputList = [];
@@ -124,26 +147,27 @@ class Block {
 }
 //!SECTION
 
+//SECTION Block List
+//NOTE Individual directions of blocks can be switched using a stick
+const blockList = [
+    {type: "redstone_block", imgLink: "images/redstone_block.png"},
+    {type: "redstone_dust", imgLink: "images/redstone_dust_off_1234.png"},
+    {type: "redstone_repeator", imgLink: "images/redstone_repeator_1_off_31.png"},
+    //{type: "redstone_comparator", imgLink: ""},//FIXME
+    //{type: "redstone_lamp", imgLink: ""},//FIXME
+    //{type: "oak_button", imgLink: ""},//FIXME
+    //{type: "note_block", imgLink: ""},//FIXME
+    {type: "lever", imgLink: "images/lever_off.png"},
+    //{type: "observer", imgLink: ""}, //FIXME
+    {type: "cobblestone", imgLink: "images/cobblestone.png"},
+    {type: "air", imgLink: "images/stone.png"}
+];
+
+
+
+//!SECTION
 
 //SECTION Update/Analysis
-/*DEPRECATED: stores all blocks as strings (with their attributes) - Don't need to anymore cause direct object conversion is possible
-var str = [];
-function stringConversion(){
-    for (let r = 0; r < 6; r++){
-        for (let c = 0; c < 6; c++){
-            //get the elements in teh grid by their data set and create 
-        }
-    }
-}
-//clears the str list and updates grid
-function clearGrid(){
-    str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
-}
-//updates the str of blocks (concerns versions)
-function updateStr(x,y,block){
-    str[x][y] = block;
-}
-*/
 
 //generic empty block generator
 function genEmptyBlock(){
@@ -174,10 +198,124 @@ function conversion(){
     }
     blocksObj = blocksV2;
     //no return statement...already accessible in blocksObj
+}   //!SECTION
+
+
+
+
+
+
+
+
+
+//REVIEW Next step, integrate the createGrid() into the update module with all specified port data etc. 
+//There are too many attributes bruh
+
+//REVIEW Once you made the integration, the base should be complete and you can start manipulating it by
+//updating the block class (finally starting the analysis part)
+
+//REVIEW Also add the missing pictures seen in FIXME anchors
+
+
+//SECTION Structure code
+function createGrid() {
+            const grid = document.getElementById('buildGrid');
+            
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.id = `cell-${row}-${col}`;
+                    grid.appendChild(cell);
+                }
+            }	
+        }
+        //create an element in the element you just created using the created id to set the img
+
+        // Set up event listeners
+function setupEventListeners() {
+    // Block selection
+    document.querySelectorAll('.block').forEach(block => {
+        block.addEventListener('click', function() {
+            // Remove selection from all blocks
+            document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+            
+            // Select this block
+            this.classList.add('selected');
+            selectedBlock = this.dataset.blockId;
+            
+            console.log(`Selected block: ${getBlockName(selectedBlock)}`);
+        });
+    });
+
+    // Grid cell placement
+    document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            if (!selectedBlock) {
+                alert('Please select a block first!');
+                return;
+            }
+            
+            const row = parseInt(this.dataset.row);
+            const col = parseInt(this.dataset.col);
+            
+            placeBlock(row, col, selectedBlock);
+        });
+    });
+
+    // Control buttons
+    document.getElementById('showArrayBtn').addEventListener('click', show2DArray);
+    document.getElementById('clearBtn').addEventListener('click', clearGrid);
 }
 
 
+// Clear the entire grid
+function clearGrid() {
+    // Reset the 2D array
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            gridArray[row][col] = null;
+        }
+    }
+    
+    // Reset the visual grid
+    document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.style.backgroundColor = '';
+        cell.style.opacity = '';
+        cell.title = '';
+    });
+    
+    document.getElementById('arrayDisplay').innerHTML = '';
+    console.log('Grid cleared!');
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', /*Initialize*/);
+
 //!SECTION
+
+
+/*DEPRECATED: stores all blocks as strings (with their attributes) - Don't need to anymore cause direct object conversion is possible
+var str = [];
+function stringConversion(){
+    for (let r = 0; r < 6; r++){
+        for (let c = 0; c < 6; c++){
+            //get the elements in teh grid by their data set and create 
+        }
+    }
+}
+//clears the str list and updates grid
+function clearGrid(){
+    str = [["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"],["x","x","x","x","x","x"]];
+}
+//updates the str of blocks (concerns versions)
+function updateStr(x,y,block){
+    str[x][y] = block;
+}
+*/
+
 
 
 /*

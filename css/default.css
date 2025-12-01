@@ -1,8 +1,7 @@
-/*//REVIEW Customize the CSS to match the class*/
     body {
         font-family: 'Courier New', monospace;
-        background-color: #75adda;
-        color: rgb(0, 0, 0);
+        background-color: rgb(122, 157, 102);;
+        color: rgb(46, 46, 46);
         text-align: center;
         padding: 20px;
     }
@@ -13,13 +12,18 @@
     }
     
     h1 {
-        color: #8c8c8c;
+        color: rgb(46, 46, 46);
         margin-bottom: 30px;
     }
-    
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* or contain, fill, etc. */
+    }
+
     .block-palette {
         /*
-        - This is where the magic happens for the block selection area:
         - display: grid: Turns this container into a CSS Grid container
         - grid-template-columns: repeat(6, 50px): Creates 6 equal columns, each 50px wide
         - repeat(6, 50px) means "create 6 columns, each 50px wide"
@@ -116,15 +120,13 @@
     }
     
     .controls {
-        /*
         
-        */
         margin: 20px 0;
     }
     
     button {
-        background-color: #55ff55;
-        color: #1a1a1a;
+        background-color: rgb(188, 188, 188);
+        color: rgb(46, 46, 46);
         border: none;
         padding: 10px 20px;
         margin: 0 10px;
@@ -135,7 +137,7 @@
     }
     
     button:hover {
-        background-color: #44ee44;
+        background-color: #848484;
     }
     
     .array-display {

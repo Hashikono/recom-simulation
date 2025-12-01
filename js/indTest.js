@@ -140,15 +140,4 @@ function conversion(){
     //no return statement...already accessible in blocksObj
 }
 
-function implementation(){
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.row = row;
-            cell.dataset.col = col;
-            cell.id = `cell-${row}-${col}`;
-            grid.appendChild(cell);
-        }
-    }
-}
+
