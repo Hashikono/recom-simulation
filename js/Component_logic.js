@@ -102,7 +102,7 @@ class Block {
     </div>
     
     Method: Each port string to array -> each array to 2d array
-
+    determineOutputs() returns this string ^^^
     */
     determineOutputs() {
         //list of output/port indexes
@@ -179,8 +179,8 @@ const blocksV0 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlo
 //converting blocks to objects
 var blocksObj = blocksV0;
 
-//ONLY converts the grid into an objects list
-function conversion(){
+//converts the grid into an objects list (reverts outputs)
+function reversion(){
     //version one of blocks
     let blocksV1 = blocksObj;
     //version two of blocks (actively constructing)
@@ -198,7 +198,54 @@ function conversion(){
     }
     blocksObj = blocksV2;
     //no return statement...already accessible in blocksObj
-}   //!SECTION
+}   
+
+//converts the blocks back into the grid (first time thing)
+function conversion(){
+    const grid = document.getElementById("placementGrid");
+    for (let r = 0; r < 6; r++){
+        for (let c = 0; c < 6; c++){
+            const cell = document.createElement("div");
+            cell.className = "grid-cell";
+            cell.id = `cell-${r}-${c}`;
+            cell.dataset.northPort = determineOutputs()
+        }
+    }
+}
+
+//Creates grid (first time thing)
+function initialization(){
+    const grid = document.getElementById("placementGrid");
+    for (let r = 0; r < 6; r++){
+        for (let c = 0; c < 6; c++){
+            const cell = document.createElement("div");
+            cell.className = "grid-cell";
+            cell.id = `cell-${r}-${c}`;
+            cell.dataset.northPort = determineOutputs()
+        }
+    }
+}
+
+/* <div 
+        class = "grid-cell"
+        id="cell-0-0" COORDINATE EXTRACTION
+        blockType = "redstone_dust"  LITERAL BLOCK
+
+        northPort = "false, 0, "empty", ["output", false]"
+        eastPort = "false, 0, "empty", ["output", false]"
+        southPort = "false, 0, "empty", ["output", false]"
+        westPort = "false, 0, "empty", ["output", false]"
+
+        <img 
+            src = "images/redstone_dust_off_1234.png"
+            alt = "images/redstone_dust_off_1234.png"
+        >
+    </div> */
+    
+
+
+
+//!SECTION
 
 
 
@@ -219,20 +266,20 @@ function conversion(){
 
 //SECTION Structure code
 function createGrid() {
-            const grid = document.getElementById('buildGrid');
-            
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'grid-cell';
-                    cell.dataset.row = row;
-                    cell.dataset.col = col;
-                    cell.id = `cell-${row}-${col}`;
-                    grid.appendChild(cell);
-                }
-            }	
+    const grid = document.getElementById('buildGrid');
+    
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.id = `cell-${row}-${col}`;
+            grid.appendChild(cell);
         }
-        //create an element in the element you just created using the created id to set the img
+    }	
+}
+//create an element in the element you just created using the created id to set the img
 
         // Set up event listeners
 function setupEventListeners() {
