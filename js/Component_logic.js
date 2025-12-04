@@ -37,7 +37,8 @@ class ComponentPort {
 
 //SECTION Block main structure (applies exclusively to dust)
 class Block {
-        constructor(portList){
+        constructor(blockTyp, portList){
+        this.blockType = blockTyp;
         this.ports = portList;
         /* [north, east, south, west] (objects)
 
@@ -57,6 +58,12 @@ class Block {
         console.log(`Inputs: ${this.inputCount} | Outputs: ${this.outputCount}`);
         */
     }
+
+    //gets the block's type
+    getType(){
+        return this.blockType;
+    }
+
 
     //checks if power exists before any computations
     //(Only applies to simulation)
@@ -171,18 +178,20 @@ const blockList = [
 
 //generic empty block generator
 function genEmptyBlock(){
-    return new Block([new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false])]);
+    return new Block("air",[new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false])]);
 }
 
-//generic blocks version
+//generic blocks version (initialization)
 const blocksV0 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-//converting blocks to objects
-var blocksObj = blocksV0;
+//block objects (begins with inititialization)
+var blocksList = blocksV0;
+//stores image sources from updates
+var imgList = []
 
-//converts the grid into an objects list (reverts outputs)
-function reversion(){
+//Updates the blocks list (and image list)
+function update(){
     //version one of blocks
-    let blocksV1 = blocksObj;
+    let blocksV1 = blocksList;
     //version two of blocks (actively constructing)
     let blocksV2 = [];
     for(let r = 0; r < str.length; r++){ //go through the rows of blocks
@@ -196,52 +205,41 @@ function reversion(){
             }
         }
     }
-    blocksObj = blocksV2;
-    //no return statement...already accessible in blocksObj
+    blocksList = blocksV2;
+    //no return statement...already accessible in blocksList
 }   
 
-//converts the blocks back into the grid (first time thing)
-function conversion(){
+//Implements the blocks list into the grid (HTML creation)
+function implementat(){
     const grid = document.getElementById("placementGrid");
     for (let r = 0; r < 6; r++){
         for (let c = 0; c < 6; c++){
+            //cell division
             const cell = document.createElement("div");
             cell.className = "grid-cell";
             cell.id = `cell-${r}-${c}`;
-            cell.dataset.northPort = determineOutputs()
+                //image
+                const image = document.createElement("img");
+                image.src = imgList[r][c];
+                image.alt = imgList[r][c];
+                cell.appendChild(image);
+            grid.appendChild(cell);
         }
     }
 }
 
-//Creates grid (first time thing)
-function initialization(){
-    const grid = document.getElementById("placementGrid");
-    for (let r = 0; r < 6; r++){
-        for (let c = 0; c < 6; c++){
-            const cell = document.createElement("div");
-            cell.className = "grid-cell";
-            cell.id = `cell-${r}-${c}`;
-            cell.dataset.northPort = determineOutputs()
-        }
-    }
-}
 
-/* <div 
+
+/*
+<div 
         class = "grid-cell"
         id="cell-0-0" COORDINATE EXTRACTION
-        blockType = "redstone_dust"  LITERAL BLOCK
-
-        northPort = "false, 0, "empty", ["output", false]"
-        eastPort = "false, 0, "empty", ["output", false]"
-        southPort = "false, 0, "empty", ["output", false]"
-        westPort = "false, 0, "empty", ["output", false]"
-
         <img 
             src = "images/redstone_dust_off_1234.png"
             alt = "images/redstone_dust_off_1234.png"
         >
-    </div> */
-    
+    </div> 
+*/
 
 
 
@@ -265,21 +263,7 @@ function initialization(){
 
 
 //SECTION Structure code
-function createGrid() {
-    const grid = document.getElementById('buildGrid');
-    
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.dataset.row = row;
-            cell.dataset.col = col;
-            cell.id = `cell-${row}-${col}`;
-            grid.appendChild(cell);
-        }
-    }	
-}
-//create an element in the element you just created using the created id to set the img
+
 
         // Set up event listeners
 function setupEventListeners() {
