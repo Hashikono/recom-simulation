@@ -190,12 +190,13 @@ var imgList = []
 
 //Updates the blocks list (and image list)
 function update(){
+//BLOCK LIST
     //version one of blocks
     let blocksV1 = blocksList;
     //version two of blocks (actively constructing)
     let blocksV2 = [];
-    for(let r = 0; r < str.length; r++){ //go through the rows of blocks
-        for (let c = 0; c < str[0].length; c++){ //go through the individual columns
+    for(let r = 0; r < str.length; r++){
+        for (let c = 0; c < str[0].length; c++){
             if (str[c] == "empty"){
                 /*
                 HERE
@@ -206,12 +207,25 @@ function update(){
         }
     }
     blocksList = blocksV2;
-    //no return statement...already accessible in blocksList
+
+//IMAGE LIST
+    for(let r = 0; r < str.length; r++){
+        for (let c = 0; c < str[0].length; c++){
+            
+        }
+    }
+
 }   
 
 //Implements the blocks list into the grid (HTML creation)
-function implementat(){
+function implement(){
+    //empties current div
     const grid = document.getElementById("placementGrid");
+    const refDiv = document.createElement("div");
+    refDiv.className = "grid-container";
+    refDiv.id = "placementGrid";
+    grid.replaceWith(refDiv);
+    //adds stuff to the div
     for (let r = 0; r < 6; r++){
         for (let c = 0; c < 6; c++){
             //cell division
@@ -229,20 +243,6 @@ function implementat(){
 }
 
 
-
-/*
-<div 
-        class = "grid-cell"
-        id="cell-0-0" COORDINATE EXTRACTION
-        <img 
-            src = "images/redstone_dust_off_1234.png"
-            alt = "images/redstone_dust_off_1234.png"
-        >
-    </div> 
-*/
-
-
-
 //!SECTION
 
 
@@ -253,8 +253,6 @@ function implementat(){
 
 
 
-//REVIEW Next step, integrate the createGrid() into the update module with all specified port data etc. 
-//There are too many attributes bruh
 
 //REVIEW Once you made the integration, the base should be complete and you can start manipulating it by
 //updating the block class (finally starting the analysis part)
