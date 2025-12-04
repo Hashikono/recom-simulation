@@ -90,23 +90,6 @@ class Block {
 
     //determines directions of outputs as a list of things to output on
     /*Ref: getEPower(boolean) | getRPower(integer) | getType(string) | getState(string) | getPrior(boolean)
-    <div 
-        class = "grid-cell"
-        id="cell-0-0" 
-        data-row = "0"  COORDINATE
-        data-col = "0"  COORDINATE
-        blockType = "redstone_dust"  LITERAL BLOCK
-
-        northPort = "false, 0, "empty", ["output", false]"
-        eastPort = "false, 0, "empty", ["output", false]"
-        southPort = "false, 0, "empty", ["output", false]"
-        westPort = "false, 0, "empty", ["output", false]"
-
-        <img 
-            src = "images/redstone_dust_off_1234.png"
-            alt = "images/redstone_dust_off_1234.png"
-        >
-    </div>
     
     Method: Each port string to array -> each array to 2d array
     determineOutputs() returns this string ^^^
@@ -154,25 +137,7 @@ class Block {
 }
 //!SECTION
 
-//SECTION Block List
-//NOTE Individual directions of blocks can be switched using a stick
-const blockList = [
-    {type: "redstone_block", imgLink: "images/redstone_block.png"},
-    {type: "redstone_dust", imgLink: "images/redstone_dust_off_1234.png"},
-    {type: "redstone_repeator", imgLink: "images/redstone_repeator_1_off_31.png"},
-    //{type: "redstone_comparator", imgLink: ""},//FIXME
-    //{type: "redstone_lamp", imgLink: ""},//FIXME
-    //{type: "oak_button", imgLink: ""},//FIXME
-    //{type: "note_block", imgLink: ""},//FIXME
-    {type: "lever", imgLink: "images/lever_off.png"},
-    //{type: "observer", imgLink: ""}, //FIXME
-    {type: "cobblestone", imgLink: "images/cobblestone.png"},
-    {type: "air", imgLink: "images/stone.png"}
-];
 
-
-
-//!SECTION
 
 //SECTION Update/Analysis
 
@@ -256,8 +221,6 @@ function implement(){
 
 //REVIEW Once you made the integration, the base should be complete and you can start manipulating it by
 //updating the block class (finally starting the analysis part)
-
-//REVIEW Also add the missing pictures seen in FIXME anchors
 
 
 //SECTION Structure code
