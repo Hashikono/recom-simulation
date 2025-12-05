@@ -1,4 +1,4 @@
-//SECTION Ports
+//Individual ports
 class ComponentPort {
     constructor(e, r, type, io){
         //Electric power
@@ -32,10 +32,8 @@ class ComponentPort {
         return iox[1]; //boolean
     }
 }
-//!SECTION
 
-
-//SECTION Block main structure (applies exclusively to dust)
+//Block main structure (applies exclusively to dust)
 class Block {
         constructor(blockTyp, portList){
         this.blockType = blockTyp;
@@ -64,10 +62,26 @@ class Block {
         return this.blockType;
     }
 
+    //get methods for port objects
+    getNorthPort(){
+        return ports[0];
+    }
 
-    //checks if power exists before any computations
+    getEastPort(){
+        return ports[1];
+    }
+
+    getSouthPort(){
+        return ports[2];
+    }
+
+    getWestPort(){
+        return ports[3];
+    }
+
+    //tests if the block has power
     //(Only applies to simulation)
-    powerCheck() {
+    powerTest() {
         if (north.ePower() || east.ePower() || south.ePower() || west.ePower()){
             return true;
         }
@@ -76,9 +90,20 @@ class Block {
         }
     }
 
-    //returns highest redstone power input value
-    maxPowerOutput(){
-        let max = 0;
+    //returns highest possible redstone power ouput value (minus one for spacing)
+    travellingPowerOutput(){
+        let max = 1;
+        for (let i = 0; i < this.ports.length; i++){
+            if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
+                max = ports[i].rPower();
+            }
+        }
+        return max-1;
+    }
+    
+    //returns highest possible redstone power ouput value (no travelling)
+    fixedPowerOutput(){
+        let max = 1;
         for (let i = 0; i < this.ports.length; i++){
             if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
                 max = ports[i].rPower();
@@ -86,101 +111,80 @@ class Block {
         }
         return max;
     }
-    
 
-    //determines directions of outputs as a list of things to output on
-    /*Ref: getEPower(boolean) | getRPower(integer) | getType(string) | getState(string) | getPrior(boolean)
-    
-    Method: Each port string to array -> each array to 2d array
-    determineOutputs() returns this string ^^^
-    */
-    determineOutputs() {
-        //list of output/port indexes
-        let outputList = [];
-        //check for priority existence
-        let priorityExist = false;
-        //logs the ports with priority for analysis only
-        let priorityList = [];
-        //analyzing priority effect on output implementation (merely for console-logging)
-        let outputAllowance = ["north","east","south","west"];
-
+    //returns bool value if block has a priority port (mainly for redstone_dust)
+    priorityExistence(){
+        let existence = false;
         for (let i = 0; i < this.ports.length; i++){
-            //checks if priority exists
-            if (this.ports[i].getPrior()){
-                priorityExist = true;
-                priorityList.push(i);
+            if (this.ports[i].getPrior() == true){
+                existence = true;
             }
         }
-        
-        if (priorityExist){ //priority exists
-            if (priorityList.length == 1){ //only one priority
-
-            } else { //more than 1 priority
-            
-            }
-        } else { //priority doesn't exist
-            
-        }
-        //allowed ports
-        console.log(`Allowed ports: ${outputAllowance}`);
-        return outputList;
+        return existence;
     }
 
-    //Runs an io test on the block
-    test() {
-        if (this.powerCheck()){
-
-        }
-        console.log("This block does not have any power")
-    }
-    
 }
-//!SECTION
 
-
+//Block Ref: getType(str) | get(dir)Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
+//Port Ref: getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
 
 //SECTION Update/Analysis
 
-//generic empty block generator
+//generic empty block generator (borders will be air)
 function genEmptyBlock(){
-    return new Block("air",[new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false]), new ComponentPort(false, 0, "empty", ["output", false])]);
+    return new Block("air","",[new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false])]);
 }
 
-//generic blocks version (initialization)
-const blocksV0 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-//block objects (begins with inititialization)
-var blocksList = blocksV0;
-//stores image sources from updates
-var imgList = []
+//block objects (begins with inititialization) | stores image sources from updates
+//Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+var blocksList = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+var imgList = Array.from({length:6}, () => Array.from({length:6}, 0));
+
 
 //Updates the blocks list (and image list)
 function update(){
-//BLOCK LIST
     //version one of blocks
     let blocksV1 = blocksList;
     //version two of blocks (actively constructing)
     let blocksV2 = [];
-    for(let r = 0; r < str.length; r++){
-        for (let c = 0; c < str[0].length; c++){
-            if (str[c] == "empty"){
-                /*
-                HERE
-                */
-            } else if (str[c] == "redstone_dust"){
-
+    for(let r = 0; r < blocksV1.length; r++){
+        for (let c = 0; c < blocksV1[0].length; c++){
+            if (blocksV1[r][c].getType() =="redstone_block"){
+                redstone_block(r,c);
+            }
+            else if (blocksV1[r][c].getType() =="redstone_dust"){
+                redstone_dust(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="redstone_repeator"){
+                redstone_repeator(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="redstone_comparator"){
+                redstone_comparator(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="redstone_lamp"){
+                redstone_lamp(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="oak_button"){
+                oak_button(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="note_block"){
+                note_block(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="lever"){
+                lever(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="observer"){
+                observer(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="cobblestone"){
+                cobblestone(r,c);
             }
         }
     }
+
     blocksList = blocksV2;
-
-//IMAGE LIST
-    for(let r = 0; r < str.length; r++){
-        for (let c = 0; c < str[0].length; c++){
-            
-        }
-    }
-
 }   
+
 
 //Implements the blocks list into the grid (HTML creation)
 function implement(){
@@ -210,17 +214,66 @@ function implement(){
 
 //!SECTION
 
+/*//SECTION Specific block update types
+> Checks surrounding of the block in V1
+    > Determine status in input/output type ports
+> update all port attributes of the block
+> update image if necessary (on/off)
+
+*/
+
+function redstone_block_update(x,y){
+    //
+}
+
+function redstone_dust_update(x,y){
+    //
+}
+
+function redstone_repeator_update(x,y){
+    //
+}
+
+function redstone_comparator_update(x,y){
+    //
+}
+
+function redstone_lamp_update(x,y){
+    //
+}
+
+function oak_button_update(x,y){
+    //
+}
+
+function note_block_update(x,y){
+    //
+}
+
+function lever_update(x,y){
+    //
+}
+
+function observer_update(x,y){
+    //
+}
+
+function cobblestone_update(x,y){
+    //
+}
+
+//!SECTION
+
+
+
+//REVIEW Rename all images to the new format
+//REVIEW create update functions for each block
 
 
 
 
 
 
-
-
-
-//REVIEW Once you made the integration, the base should be complete and you can start manipulating it by
-//updating the block class (finally starting the analysis part)
 
 
 //SECTION Structure code
@@ -307,7 +360,39 @@ function updateStr(x,y,block){
     str[x][y] = block;
 }
 */
+/* DEPRECATED: priority check and calculations within the block object
+function test() {
+    //list of output/port indexes
+    let outputList = [];
+    //check for priority existence
+    let priorityExist = false;
+    //logs the ports with priority for analysis only
+    let priorityList = [];
+    //analyzing priority effect on output implementation (merely for console-logging)
+    let outputAllowance = ["north","east","south","west"];
 
+    for (let i = 0; i < this.ports.length; i++){
+        //checks if priority exists
+        if (this.ports[i].getPrior()){
+            priorityExist = true;
+            priorityList.push(i);
+        }
+    }
+    
+    if (priorityExist){ //priority exists
+        if (priorityList.length == 1){ //only one priority
+
+        } else { //more than 1 priority
+        
+        }
+    } else { //priority doesn't exist
+        
+    }
+    //allowed ports
+    console.log(`Allowed ports: ${outputAllowance}`);
+    return outputList;
+}
+*/
 
 
 /*
@@ -337,7 +422,7 @@ Directions:
     - repeators etc. will start with the side of the input and then output (ex. 42)
 - in images, they represents both inputs and outputs available 
     - the code will determine what is an input/output
-- IMAGE STRUCTURE: (block name)_(state [starts at 1])_(power)_(direction).png
+- IMAGE STRUCTURE: (block name)_(direction)_(state [starts at 1])_(power on/off).png
     - every block will process this semi-uniquely
 
 
@@ -374,8 +459,21 @@ Variables/Parameters (ports):
     - 16 - reserved for power blocks
     - 0 - no (more) power
 
+*type - string
+    - "redstone_block"
+    - "redstone_dust"
+    - "redstone_repeator"
+    - "redstone_comparator"
+    - "redstone_lamp"
+    - "oak_button"
+    - "note_block"
+    - "lever"
+    - "observer"
+    - "cobblestone"
+    - "air"
+
 *io - list[type, priority]
-    - Type - string
+    - State - string
         - "input" - input port
         - "output" - output port
 
@@ -394,21 +492,6 @@ Variables/Parameters (ports):
     - Output 1 : pistons, repeators (to input side), etc.
     - Empty 0 : Not connected to anything (air block)
     - Empty 1 : Doesn't exist
-
-
-//NOTE list of block types
-- Blocks:
-    - redstone_block
-    - redstone_dust
-    - redstone_repeator
-    - redstone_comparator
-    - redstone_lamp
-    - oak_button
-    - note_block
-    - lever
-    - observer
-    - cobblestone
-    - air
     
 
 //!SECTION
