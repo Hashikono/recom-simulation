@@ -1,87 +1,92 @@
 //Individual ports
-class ComponentPort {
-    constructor(e, r, type, io){
+class ComponentPort { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
+    constructor(ePow, rPow, blockType, io, priority){
         //Electric power
-        ePow = e;
+        this.ePow = ePow;
         //Redstone power
-        rPow = r;
+        this.rPow = rPow;
         //block type;
-        typ = type;
-        //i/o list
-        iox = io;
+        this.blockType = blockType;
+        //input/output
+        this.io = io;
+        //priority
+        this.priority = priority;
     }
 
-    getEPower() {
-        return ePow; //boolean
+    getEPower() { //boolean
+        return this.sePow; 
     }
     
-    getRPower() {
-        return rPow; //integer
+    getRPower() { //integer
+        return this.rPow; 
     }
 
-    getType(){
-        return typ; //string
+    getType() { //string
+        return this.blockType; 
     }
 
-    getState() {
-        return iox[0]; //string
+    getState() { //string
+        return this.io; 
     }
 
-    getPrior() {
+    getPrior() { //boolean
         //priority = redirection
-        return iox[1]; //boolean
+        return this.priority; 
     }
 }
 
-//Block main structure (applies exclusively to dust)
-class Block {
-        constructor(blockTyp, portList){
-        this.blockType = blockTyp;
-        this.ports = portList;
-        /* [north, east, south, west] (objects)
-
-        //AS OF NOW, I/O COUNT IS DEPRECATED
-        /*
-        this.inputCount = 0;
-        this.outputCount = 0;
-
-        //establish io count
-        for (let i = 0; i < this.ports.length; i++){
-            if (this.ports[i] == "input"){
-                this.inputCount++;
-            } else if (this.ports[i] == "output"){
-                this.outputCount++;
-            }
-        }
-        console.log(`Inputs: ${this.inputCount} | Outputs: ${this.outputCount}`);
-        */
+//Block main structure
+class Block { //blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
+    constructor(blockType, direction, state, imgPower, portsList){
+        //block name ("redstone_block")
+        this.blockType = blockType;
+        //refer to table below
+        this.direction = direction;
+        //repeator ticks etc.
+        this.state = state;
+        //"on" or "off"
+        this.imgPower = imgPower;
+        //port objects [north, east, south, west] (objects)
+        this.portsList = portsList;
     }
 
-    //gets the block's type
-    getType(){
+    //get methods for general info (mainly for image conversion)
+    getType(){ //string
         return this.blockType;
     }
 
+    getDirection(){ //integer
+        return this.direction;
+    }
+
+    getState(){ //integer
+        return this.state;
+    }
+
+    getImgPower(){ //string
+        return this.imgPower;
+    }
+
     //get methods for port objects
-    getNorthPort(){
-        return ports[0];
+    getNorthPort(){ //object
+        return portsList[0];
     }
 
-    getEastPort(){
-        return ports[1];
+    getEastPort(){ //object
+        return portsList[1];
     }
 
-    getSouthPort(){
-        return ports[2];
+    getSouthPort(){ //object
+        return portsList[2];
     }
 
-    getWestPort(){
-        return ports[3];
+    getWestPort(){ //object
+        return portsList[3];
     }
 
     //tests if the block has power
     //(Only applies to simulation)
-    powerTest() {
+    powerTest() { //boolean
         if (north.ePower() || east.ePower() || south.ePower() || west.ePower()){
             return true;
         }
@@ -91,7 +96,7 @@ class Block {
     }
 
     //returns highest possible redstone power ouput value (minus one for spacing)
-    travellingPowerOutput(){
+    travellingPowerOutput(){ //integer
         let max = 1;
         for (let i = 0; i < this.ports.length; i++){
             if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
@@ -102,7 +107,7 @@ class Block {
     }
     
     //returns highest possible redstone power ouput value (no travelling)
-    fixedPowerOutput(){
+    fixedPowerOutput(){ //integer
         let max = 1;
         for (let i = 0; i < this.ports.length; i++){
             if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
@@ -113,7 +118,7 @@ class Block {
     }
 
     //returns bool value if block has a priority port (mainly for redstone_dust)
-    priorityExistence(){
+    priorityExistence(){ //boolean
         let existence = false;
         for (let i = 0; i < this.ports.length; i++){
             if (this.ports[i].getPrior() == true){
@@ -125,14 +130,15 @@ class Block {
 
 }
 
-//Block Ref: getType(str) | get(dir)Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
+//Block Ref: getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
+//           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
 //Port Ref: getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
 
 //SECTION Update/Analysis
 
 //generic empty block generator (borders will be air)
 function genEmptyBlock(){
-    return new Block("air","",[new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false]), new ComponentPort(false, 0, "air", ["output", false])]);
+    return new Block("air", 1, 1, "off", [new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false)]);
 }
 
 //block objects (begins with inititialization) | stores image sources from updates
@@ -265,17 +271,10 @@ function cobblestone_update(x,y){
 //!SECTION
 
 /*
-//REVIEW You may need to add another data type to the block class to handle variations of blocks,
-         variations and all
-
-         You may need to think about also making the name on every block something standard (like 
-         blocks without variations shoud still have those just in case at 1)
-
-//REVIEW maybe update naming conventions on attributes, bcs right now, .type() can mean
-         a lot of different things lol
-
 //REVIEW Rename all images to the new format
-//IMAGE STRUCTURE: (block name)_(direction)_(state [starts at 1])_(power on/off).png
+        You may need to think about also making the name on every block something standard (like 
+         blocks without variations shoud still have those just in case at 1)
+//IMAGE STRUCTURE: (block type)_(direction)_(state [starts at 1])_(s on/off).png
 
 //REVIEW create update functions for each block
 */
@@ -431,7 +430,7 @@ Directions:
     - repeators etc. will start with the side of the input and then output (ex. 42)
 - in images, they represents both inputs and outputs available 
     - the code will determine what is an input/output
-- IMAGE STRUCTURE: (block name)_(direction)_(state [starts at 1])_(power on/off).png
+- IMAGE STRUCTURE: (block type)_(direction)_(state [starts at 1])_(power on/off).png
     - every block will process this semi-uniquely
 
 
