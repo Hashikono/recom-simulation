@@ -155,10 +155,7 @@ function update(){
     let blocksV2 = [];
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
-            if (blocksV1[r][c].getType() =="redstone_block"){
-                redstone_block(r,c);
-            }
-            else if (blocksV1[r][c].getType() =="redstone_dust"){
+            if (blocksV1[r][c].getType() =="redstone_dust"){
                 redstone_dust(r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_repeator"){
@@ -228,10 +225,6 @@ function implement(){
 
 */
 
-function redstone_block_update(x,y){
-    //
-}
-
 function redstone_dust_update(x,y){
     //
 }
@@ -271,10 +264,10 @@ function cobblestone_update(x,y){
 //!SECTION
 
 /*
-//REVIEW Rename all images to the new format
-        You may need to think about also making the name on every block something standard (like 
-         blocks without variations shoud still have those just in case at 1)
+//REVIEW Rename all images to the new format (only the ones that deal with directions etc.)
 //IMAGE STRUCTURE: (block type)_(direction)_(state [starts at 1])_(s on/off).png
+
+//continue starting from redstone_dust
 
 //REVIEW create update functions for each block
 */
