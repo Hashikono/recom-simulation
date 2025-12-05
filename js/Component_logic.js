@@ -264,12 +264,21 @@ function cobblestone_update(x,y){
 
 //!SECTION
 
+/*
+//REVIEW You may need to add another data type to the block class to handle variations of blocks,
+         variations and all
 
+         You may need to think about also making the name on every block something standard (like 
+         blocks without variations shoud still have those just in case at 1)
+
+//REVIEW maybe update naming conventions on attributes, bcs right now, .type() can mean
+         a lot of different things lol
 
 //REVIEW Rename all images to the new format
+//IMAGE STRUCTURE: (block name)_(direction)_(state [starts at 1])_(power on/off).png
+
 //REVIEW create update functions for each block
-
-
+*/
 
 
 
