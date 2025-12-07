@@ -13,6 +13,7 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
         this.priority = priority;
     }
 
+    //get methods for port data
     getEPower() { //boolean
         return this.sePow; 
     }
@@ -33,6 +34,28 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
         //priority = redirection
         return this.priority; 
     }
+
+    //set methods for port data
+    setEPower(x) { //boolean
+        this.ePow = x; 
+    }
+    
+    setRPower(x) { //integer
+        this.rPow = x; 
+    }
+
+    setType(x) { //string
+        this.blockType = x; 
+    }
+
+    setState(x) { //string
+        this.io = x; 
+    }
+
+    setPrior(x) { //boolean
+        //priority = redirection
+        this.priority = x; 
+    }
 }
 
 //Block main structure
@@ -50,7 +73,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         this.portsList = portsList;
     }
 
-    //get methods for general info (mainly for image conversion)
+    //get methods for general block data (mainly for image conversion)
     getType(){ //string
         return this.blockType;
     }
@@ -65,6 +88,23 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
     getImgPower(){ //string
         return this.imgPower;
+    }
+
+    //set methods for general block data
+    setType(x){ //string
+        this.blockType = x;
+    }
+
+    setDirection(x){ //integer
+        this.direction = x;
+    }
+
+    setState(x){ //integer
+        this.state = x;
+    }
+
+    setImgPower(x){ //string
+        this.imgPower = x;
     }
 
     //get methods for port objects
@@ -131,10 +171,10 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 }
 
 //Port Ref:  new Port(ePow(bool), rPow(int), blockType(str), io(str), priority(bool))
-//           getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
+//           s/getEPower(bool) | s/getRPower(int) | s/getType(str) | s/getState(str) | s/getPrior(bool)
 
 //Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
-//           getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
+//           s/getType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower() | get(dir)Port(obj)
 //           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
 
 //SECTION Update/Analysis
@@ -147,16 +187,12 @@ function genEmptyBlock(){
 //block objects (begins with inititialization) | stores image sources from updates
 //Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+var blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var imgListV1 = Array.from({length:6}, () => Array.from({length:6}, ""));
-
+var imgListV2 = Array.from({length:6}, () => Array.from({length:6}, ""));
 
 //Updates the blocks list (and image list)
 function update(){
-    //version two of blocks (actively constructing)
-    let blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-    //version two of images (debugging)
-    let imgListV2 = Array.from({length:6}, () => Array.from({length:6}, ""));
-
     //main updater
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
@@ -164,34 +200,34 @@ function update(){
             let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
 
             if (blocksV1[r][c].getType() =="redstone_block"){
-                temp = redstone_block_update(r,c);
+                temp = redstone_block_update(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_dust"){
-                temp = redstone_dust(r,c);
+                temp = redstone_dust(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_repeator"){
-                temp = redstone_repeator(r,c);
+                temp = redstone_repeator(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_comparator"){
-                temp = redstone_comparator(r,c);
+                temp = redstone_comparator(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_lamp"){
-                temp = redstone_lamp(r,c);
+                temp = redstone_lamp(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="oak_button"){
-                temp = oak_button(r,c);
+                temp = oak_button(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="note_block"){
-                temp = note_block(r,c);
+                temp = note_block(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="lever"){
-                temp = lever(r,c);
+                temp = lever(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="observer"){
-                temp = observer(r,c);
+                temp = observer(temp,r,c);
             } 
             else if (blocksV1[r][c].getType() =="cobblestone"){
-                temp = cobblestone(r,c);
+                temp = cobblestone(temp,r,c);
             }
             
             blocksV2[r][c] = temp[0];
@@ -248,10 +284,10 @@ function implement(){
 //           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
 
 let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
-
 */
-//tests ePower on surrounding blocks
-function ePowerTest(x,y){
+
+//only tests ePower on surrounding blocks
+function ePowerTest(temp,x,y){
     let power = false;
     let testBlocks = [1,2,3,4];
     if (x-1 < 0){
@@ -285,64 +321,162 @@ function ePowerTest(x,y){
     return power;
 }
 
-function redstone_block_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/redstone_block.png
+function redstone_block_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        
+        
     }
+    
+    return temp;
 }
 
-function redstone_dust_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function redstone_dust_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/redstone_dust_12_off.png"
+        //"images/redstone_dust_12_on.png"
+        //"images/redstone_dust_13_off.png"
+        //"images/redstone_dust_13_on.png"
+        //"images/redstone_dust_14_off.png"
+        //"images/redstone_dust_14_on.png"
+        //"images/redstone_dust_23_off.png"
+        //"images/redstone_dust_23_on.png"
+        //"images/redstone_dust_24_off.png"
+        //"images/redstone_dust_24_on.png"
+        //"images/redstone_dust_34_off.png"
+        //"images/redstone_dust_34_on.png"
+        //"images/redstone_dust_123_off.png"
+        //"images/redstone_dust_123_on.png"
+        //"images/redstone_dust_124_off.png"
+        //"images/redstone_dust_124_on.png"
+        //"images/redstone_dust_134_off.png"
+        //"images/redstone_dust_134_on.png"
+        //"images/redstone_dust_234_off.png"
+        //"images/redstone_dust_234_on.png"
+        //"images/redstone_dust_1234_off.png"
+        //"images/redstone_dust_1234_on.png"
     }
+    
+    return temp;
 }
 
-function redstone_repeator_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function redstone_repeator_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/redstone_repeator_13_1_off.png"
+        //"images/redstone_repeator_13_1_on.png"
+        //"images/redstone_repeator_13_2_off.png"
+        //"images/redstone_repeator_13_2_on.png"
+        //"images/redstone_repeator_13_3_off.png"
+        //"images/redstone_repeator_13_3_on.png"
+        //"images/redstone_repeator_13_4_off.png"
+        //"images/redstone_repeator_13_4_on.png"
+        //"images/redstone_repeator_24_1_off.png"
+        //"images/redstone_repeator_24_1_on.png"
+        //"images/redstone_repeator_24_2_off.png"
+        //"images/redstone_repeator_24_2_on.png"
+        //"images/redstone_repeator_24_3_off.png"
+        //"images/redstone_repeator_24_3_on.png"
+        //"images/redstone_repeator_24_4_off.png"
+        //"images/redstone_repeator_24_4_on.png"
+        //"images/redstone_repeator_31_1_off.png"
+        //"images/redstone_repeator_31_1_on.png"
+        //"images/redstone_repeator_31_2_off.png"
+        //"images/redstone_repeator_31_2_on.png"
+        //"images/redstone_repeator_31_3_off.png"
+        //"images/redstone_repeator_31_3_on.png"
+        //"images/redstone_repeator_31_4_off.png"
+        //"images/redstone_repeator_31_4_on.png"
+        //"images/redstone_repeator_42_1_off.png"
+        //"images/redstone_repeator_42_1_on.png"
+        //"images/redstone_repeator_42_2_off.png"
+        //"images/redstone_repeator_42_2_on.png"
+        //"images/redstone_repeator_42_3_off.png"
+        //"images/redstone_repeator_42_3_on.png"
+        //"images/redstone_repeator_42_4_off.png"
+        //"images/redstone_repeator_42_4_on.png"
     }
+    
+    return temp;
 }
 
-function redstone_comparator_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function redstone_comparator_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/redstone_comparator_13_1_off.png"
+        //"images/redstone_comparator_13_1_on.png"
+        //"images/redstone_comparator_13_2_off.png"
+        //"images/redstone_comparator_13_2_on.png"
+        //"images/redstone_comparator_24_1_off.png"
+        //"images/redstone_comparator_24_1_on.png"
+        //"images/redstone_comparator_24_2_off.png"
+        //"images/redstone_comparator_24_2_on.png"
+        //"images/redstone_comparator_31_1_off.png"
+        //"images/redstone_comparator_31_1_on.png"
+        //"images/redstone_comparator_31_2_off.png"
+        //"images/redstone_comparator_31_2_on.png"
+        //"images/redstone_comparator_42_1_off.png"
+        //"images/redstone_comparator_42_1_on.png"
+        //"images/redstone_comparator_42_2_off.png"
+        //"images/redstone_comparator_42_2_on.png"
     }
+    
+    return temp;
 }
 
-function redstone_lamp_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function redstone_lamp_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/redstone_lamp_off.png"
+        //"images/redstone_lamp_on.png"
     }
+    
+    return temp;
 }
 
-function oak_button_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function oak_button_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/oak_button_off.png"
+        //"images/oak_button_on.png"
     }
+    
+    return temp;
 }
 
-function note_block_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function note_block_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/note_block.png"
     }
+    
+    return temp;
 }
 
-function lever_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/lever_off.png
+function lever_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/lever_off.png"
+        //"images/lever_on.png"
     }
+    
+    return temp;
 }
 
-function observer_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/.png
+function observer_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/observer_13_off.png"
+        //"images/observer_13_on.png"
+        //"images/observer_24_off.png"
+        //"images/observer_24_on.png"
+        //"images/observer_31_off.png"
+        //"images/observer_31_on.png"
+        //"images/observer_42_off.png"
+        //"images/observer_42_on.png"
     }
+    
+    return temp;
 }
 
-function cobblestone_update(x,y){
-    if (ePowerTest(x,y)){
-        //images/cobblestone.png
+function cobblestone_update(temp,x,y){
+    if (ePowerTest(temp,x,y)){
+        //"images/cobblestone.png"
     }
+    
+    return temp;
 }
 
 //!SECTION
