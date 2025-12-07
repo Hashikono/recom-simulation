@@ -1,12 +1,12 @@
 //Individual ports
 class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
-    constructor(ePow, rPow, blockType, io, priority){
+    constructor(ePow, rPow, conBlockType, io, priority){
         //Electric power
         this.ePow = ePow;
         //Redstone power
         this.rPow = rPow;
         //block type;
-        this.blockType = blockType;
+        this.conBlockType = conBlockType;
         //input/output
         this.io = io;
         //priority
@@ -22,11 +22,11 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
         return this.rPow; 
     }
 
-    getType() { //string
-        return this.blockType; 
+    getConBlockType() { //string
+        return this.conBlockType; 
     }
 
-    getState() { //string
+    getIo() { //string
         return this.io; 
     }
 
@@ -44,11 +44,11 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
         this.rPow = x; 
     }
 
-    setType(x) { //string
-        this.blockType = x; 
+    setConBlockType(x) { //string
+        this.conBlockType = x; 
     }
 
-    setState(x) { //string
+    setIo(x) { //string
         this.io = x; 
     }
 
@@ -60,7 +60,7 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
 
 //Block main structure
 class Block { //blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4)
-    constructor(blockType, direction, state, imgPower, portsList){
+    constructor(blockType, direction, state, imgPower, img, portsList){
         //block name ("redstone_block")
         this.blockType = blockType;
         //refer to table below
@@ -69,12 +69,14 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         this.state = state;
         //"on" or "off"
         this.imgPower = imgPower;
+        //stores image paths
+        this.img = img;
         //port objects [north, east, south, west] (objects)
         this.portsList = portsList;
     }
 
     //get methods for general block data (mainly for image conversion)
-    getType(){ //string
+    getBlockType(){ //string
         return this.blockType;
     }
 
@@ -90,8 +92,12 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         return this.imgPower;
     }
 
+    getImg(){ //string
+        return this.img;
+    }
+
     //set methods for general block data
-    setType(x){ //string
+    setBlockType(x){ //string
         this.blockType = x;
     }
 
@@ -105,6 +111,60 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
     setImgPower(x){ //string
         this.imgPower = x;
+    }
+
+    //no parameters - converts attributes to image path
+    //REVIEW finish img path assembly
+    setImg(){ //string
+        if (this.blockType = "redstone_block"){
+            this.img = "images/redstone_block.png";
+        }
+
+        else if (this.blockType = "redstone_dust"){
+            //"images/redstone_dust_12_off.png", "images/redstone_dust_12_on.png", "images/redstone_dust_13_off.png", "images/redstone_dust_13_on.png", "images/redstone_dust_14_off.png", "images/redstone_dust_14_on.png", "images/redstone_dust_23_off.png", "images/redstone_dust_23_on.png", "images/redstone_dust_24_off.png", "images/redstone_dust_24_on.png", "images/redstone_dust_34_off.png", "images/redstone_dust_34_on.png", "images/redstone_dust_123_off.png", "images/redstone_dust_123_on.png", "images/redstone_dust_124_off.png", "images/redstone_dust_124_on.png", "images/redstone_dust_134_off.png", "images/redstone_dust_134_on.png", "images/redstone_dust_234_off.png", "images/redstone_dust_234_on.png", "images/redstone_dust_1234_off.png", "images/redstone_dust_1234_on.png"
+        
+        }
+
+        else if (this.blockType = "redstone_repeator"){
+            //"images/redstone_repeator_13_1_off.png", "images/redstone_repeator_13_1_on.png", "images/redstone_repeator_13_2_off.png", "images/redstone_repeator_13_2_on.png", "images/redstone_repeator_13_3_off.png", "images/redstone_repeator_13_3_on.png", "images/redstone_repeator_13_4_off.png", "images/redstone_repeator_13_4_on.png", "images/redstone_repeator_24_1_off.png", "images/redstone_repeator_24_1_on.png", "images/redstone_repeator_24_2_off.png", "images/redstone_repeator_24_2_on.png", "images/redstone_repeator_24_3_off.png", "images/redstone_repeator_24_3_on.png", "images/redstone_repeator_24_4_off.png", "images/redstone_repeator_24_4_on.png", "images/redstone_repeator_31_1_off.png", "images/redstone_repeator_31_1_on.png", "images/redstone_repeator_31_2_off.png", "images/redstone_repeator_31_2_on.png", "images/redstone_repeator_31_3_off.png", "images/redstone_repeator_31_3_on.png", "images/redstone_repeator_31_4_off.png", "images/redstone_repeator_31_4_on.png", "images/redstone_repeator_42_1_off.png", "images/redstone_repeator_42_1_on.png", "images/redstone_repeator_42_2_off.png", "images/redstone_repeator_42_2_on.png", "images/redstone_repeator_42_3_off.png", "images/redstone_repeator_42_3_on.png", "images/redstone_repeator_42_4_off.png", "images/redstone_repeator_42_4_on.png"
+
+        }
+
+        else if (this.blockType = "redstone_comparator"){
+            //"images/redstone_comparator_13_1_off.png", "images/redstone_comparator_13_1_on.png", "images/redstone_comparator_13_2_off.png", "images/redstone_comparator_13_2_on.png", "images/redstone_comparator_24_1_off.png", "images/redstone_comparator_24_1_on.png", "images/redstone_comparator_24_2_off.png", "images/redstone_comparator_24_2_on.png", "images/redstone_comparator_31_1_off.png", "images/redstone_comparator_31_1_on.png", "images/redstone_comparator_31_2_off.png", "images/redstone_comparator_31_2_on.png", "images/redstone_comparator_42_1_off.png", "images/redstone_comparator_42_1_on.png", "images/redstone_comparator_42_2_off.png", "images/redstone_comparator_42_2_on.png"
+
+        }
+
+        else if (this.blockType = "redstone_lamp"){
+            //"images/redstone_lamp_off.png", "images/redstone_lamp_on.png"
+            
+        }
+
+        else if (this.blockType = "oak_button"){
+            //"images/oak_button_off.png", "images/oak_button_on.png"
+
+        }
+
+        else if (this.blockType = "note_block"){
+            //"images/note_block.png"
+        
+        }
+
+        else if (this.blockType = "lever"){
+            //"images/lever_off.png", "images/lever_on.png"
+
+        }
+
+        else if (this.blockType = "observer"){
+            //"images/observer_13_off.png", "images/observer_13_on.png", "images/observer_24_off.png", "images/observer_24_on.png", "images/
+        
+        }
+
+        else if (this.blockType = "cobblestone"){
+            //"images/cobblestone.png"
+        
+        }
+
     }
 
     //get methods for port objects
@@ -127,7 +187,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //tests if the block has power
     //(Only applies to simulation)
     powerTest() { //boolean
-        if (this.portsList[0].ePower() || this.portsList[1].ePower() || this.portsList[2].ePower() || this.portsList[3].ePower()){
+        if (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower()){
             return true;
         }
         else{
@@ -138,9 +198,9 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //returns highest possible redstone power ouput value (minus one for spacing)
     travellingPowerOutput(){ //integer
         let max = 1;
-        for (let i = 0; i < this.ports.length; i++){
-            if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
-                max = ports[i].rPower();
+        for (let i = 0; i < this.portsList.length; i++){
+            if (this.portsList[i].getIo() == "input" && this.portsList[i].getRPower() > max){
+                max = portsList[i].getRPower();
             }
         }
         return max-1;
@@ -149,9 +209,9 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //returns highest possible redstone power ouput value (no travelling)
     fixedPowerOutput(){ //integer
         let max = 1;
-        for (let i = 0; i < this.ports.length; i++){
-            if (this.ports[i].getType() == "input" && this.ports[i].rPower() > max){
-                max = ports[i].rPower();
+        for (let i = 0; i < this.portsList.length; i++){
+            if (this.portsList[i].getIo() == "input" && this.portsList[i].getRPower() > max){
+                max = portsList[i].getRPower();
             }
         }
         return max;
@@ -160,8 +220,8 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //returns bool value if block has a priority port (mainly for redstone_dust)
     priorityExistence(){ //boolean
         let existence = false;
-        for (let i = 0; i < this.ports.length; i++){
-            if (this.ports[i].getPrior() == true){
+        for (let i = 0; i < this.portsList.length; i++){
+            if (this.portsList[i].getPrior() == true){
                 existence = true;
             }
         }
@@ -170,26 +230,25 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
 }
 
-//Port Ref:  new Port(ePow(bool), rPow(int), blockType(str), io(str), priority(bool))
-//           s/getEPower(bool) | s/getRPower(int) | s/getType(str) | s/getState(str) | s/getPrior(bool)
+//Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
+//           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
-//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
-//           s/getType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower() | get(dir)Port(obj)
+//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
+//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str) | get(dir)Port(obj)
 //           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
+//           *setImg() has no parameters
 
 //SECTION Update/Analysis
 
 //generic empty block generator (borders will be air)
 function genEmptyBlock(){
-    return new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
+    return new Block("air", 1234, 1, "off", "images/air.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
 }
 
 //block objects (begins with inititialization) | stores image sources from updates
 //Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-var imgListV1 = Array.from({length:6}, () => Array.from({length:6}, ""));
-var imgListV2 = Array.from({length:6}, () => Array.from({length:6}, ""));
 
 //Updates the blocks list (and image list)
 function update(){
@@ -197,46 +256,44 @@ function update(){
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
             //temp variables to update item @ [r][c] (index 0 = obj, index 1 = img)
-            let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
+            let temp = new Block("air", 1, 1, "off", "images/air.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
 
-            if (blocksV1[r][c].getType() =="redstone_block"){
-                temp = redstone_block_update(temp,r,c);
+            if (blocksV1[r][c].getBlockType() =="redstone_block"){
+                redstone_block_update(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="redstone_dust"){
-                temp = redstone_dust(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="redstone_dust"){
+                redstone_dust(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="redstone_repeator"){
-                temp = redstone_repeator(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="redstone_repeator"){
+                redstone_repeator(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="redstone_comparator"){
-                temp = redstone_comparator(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="redstone_comparator"){
+                redstone_comparator(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="redstone_lamp"){
-                temp = redstone_lamp(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="redstone_lamp"){
+                redstone_lamp(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="oak_button"){
-                temp = oak_button(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="oak_button"){
+                oak_button(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="note_block"){
-                temp = note_block(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="note_block"){
+                note_block(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="lever"){
-                temp = lever(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="lever"){
+                lever(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="observer"){
-                temp = observer(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="observer"){
+                observer(temp,r,c);
             } 
-            else if (blocksV1[r][c].getType() =="cobblestone"){
-                temp = cobblestone(temp,r,c);
+            else if (blocksV1[r][c].getBlockType() =="cobblestone"){
+                cobblestone(temp,r,c);
             }
             
             blocksV2[r][c] = temp[0];
-            imgListV2[r][c] = temp[1];
         }
     }
 
     blocksV1 = blocksV2;
-    imgLIstV1 = imgListV2;
 }   
 
 
@@ -257,8 +314,8 @@ function implement(){
             cell.id = `cell-${r}-${c}`;
                 //image
                 const image = document.createElement("img");
-                image.src = imgListV1[r][c];
-                image.alt = imgListV1[r][c];
+                image.src = blocksV1[r][c].getImg();
+                image.alt = blocksV1[r][c].getImg();
                 cell.appendChild(image);
             grid.appendChild(cell);
         }
@@ -276,18 +333,19 @@ function implement(){
 > update image if necessary (on/off)
 > returns a list - [new object, image string]
 
-//Port Ref:  new Port(ePow(bool), rPow(int), blockType(str), io(str), priority(bool))
-//           getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
+//Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
+//           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
-//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
-//           getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
+//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
+//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str) | get(dir)Port(obj)
 //           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
+//           *setImg() has no parameters
 
 let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
 */
 
-//only tests ePower on surrounding blocks
-function ePowerTest(temp,x,y){
+//tests ePower on surrounding blocks
+function ePowerTest(ls,x,y){
     let power = false;
     let testBlocks = [1,2,3,4];
     if (x-1 < 0){
@@ -318,165 +376,95 @@ function ePowerTest(temp,x,y){
         }
     }
 
+    //sets ePower for all ports
+    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
+    if (power){
+        ls[0].getNorthPort().setEPower(true);
+        ls[0].getEastPort().setEPower(true);
+        ls[0].getSouthPort().setEPower(true);
+        ls[0].getWestPort().setEPower(true);
+    }
     return power;
 }
 
-function redstone_block_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        
-        
+function redstone_block_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function redstone_dust_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/redstone_dust_12_off.png"
-        //"images/redstone_dust_12_on.png"
-        //"images/redstone_dust_13_off.png"
-        //"images/redstone_dust_13_on.png"
-        //"images/redstone_dust_14_off.png"
-        //"images/redstone_dust_14_on.png"
-        //"images/redstone_dust_23_off.png"
-        //"images/redstone_dust_23_on.png"
-        //"images/redstone_dust_24_off.png"
-        //"images/redstone_dust_24_on.png"
-        //"images/redstone_dust_34_off.png"
-        //"images/redstone_dust_34_on.png"
-        //"images/redstone_dust_123_off.png"
-        //"images/redstone_dust_123_on.png"
-        //"images/redstone_dust_124_off.png"
-        //"images/redstone_dust_124_on.png"
-        //"images/redstone_dust_134_off.png"
-        //"images/redstone_dust_134_on.png"
-        //"images/redstone_dust_234_off.png"
-        //"images/redstone_dust_234_on.png"
-        //"images/redstone_dust_1234_off.png"
-        //"images/redstone_dust_1234_on.png"
+function redstone_dust_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function redstone_repeator_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/redstone_repeator_13_1_off.png"
-        //"images/redstone_repeator_13_1_on.png"
-        //"images/redstone_repeator_13_2_off.png"
-        //"images/redstone_repeator_13_2_on.png"
-        //"images/redstone_repeator_13_3_off.png"
-        //"images/redstone_repeator_13_3_on.png"
-        //"images/redstone_repeator_13_4_off.png"
-        //"images/redstone_repeator_13_4_on.png"
-        //"images/redstone_repeator_24_1_off.png"
-        //"images/redstone_repeator_24_1_on.png"
-        //"images/redstone_repeator_24_2_off.png"
-        //"images/redstone_repeator_24_2_on.png"
-        //"images/redstone_repeator_24_3_off.png"
-        //"images/redstone_repeator_24_3_on.png"
-        //"images/redstone_repeator_24_4_off.png"
-        //"images/redstone_repeator_24_4_on.png"
-        //"images/redstone_repeator_31_1_off.png"
-        //"images/redstone_repeator_31_1_on.png"
-        //"images/redstone_repeator_31_2_off.png"
-        //"images/redstone_repeator_31_2_on.png"
-        //"images/redstone_repeator_31_3_off.png"
-        //"images/redstone_repeator_31_3_on.png"
-        //"images/redstone_repeator_31_4_off.png"
-        //"images/redstone_repeator_31_4_on.png"
-        //"images/redstone_repeator_42_1_off.png"
-        //"images/redstone_repeator_42_1_on.png"
-        //"images/redstone_repeator_42_2_off.png"
-        //"images/redstone_repeator_42_2_on.png"
-        //"images/redstone_repeator_42_3_off.png"
-        //"images/redstone_repeator_42_3_on.png"
-        //"images/redstone_repeator_42_4_off.png"
-        //"images/redstone_repeator_42_4_on.png"
+function redstone_repeator_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function redstone_comparator_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/redstone_comparator_13_1_off.png"
-        //"images/redstone_comparator_13_1_on.png"
-        //"images/redstone_comparator_13_2_off.png"
-        //"images/redstone_comparator_13_2_on.png"
-        //"images/redstone_comparator_24_1_off.png"
-        //"images/redstone_comparator_24_1_on.png"
-        //"images/redstone_comparator_24_2_off.png"
-        //"images/redstone_comparator_24_2_on.png"
-        //"images/redstone_comparator_31_1_off.png"
-        //"images/redstone_comparator_31_1_on.png"
-        //"images/redstone_comparator_31_2_off.png"
-        //"images/redstone_comparator_31_2_on.png"
-        //"images/redstone_comparator_42_1_off.png"
-        //"images/redstone_comparator_42_1_on.png"
-        //"images/redstone_comparator_42_2_off.png"
-        //"images/redstone_comparator_42_2_on.png"
+function redstone_comparator_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function redstone_lamp_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/redstone_lamp_off.png"
-        //"images/redstone_lamp_on.png"
+function redstone_lamp_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function oak_button_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/oak_button_off.png"
-        //"images/oak_button_on.png"
+function oak_button_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function note_block_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/note_block.png"
+function note_block_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function lever_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/lever_off.png"
-        //"images/lever_on.png"
+function lever_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function observer_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/observer_13_off.png"
-        //"images/observer_13_on.png"
-        //"images/observer_24_off.png"
-        //"images/observer_24_on.png"
-        //"images/observer_31_off.png"
-        //"images/observer_31_on.png"
-        //"images/observer_42_off.png"
-        //"images/observer_42_on.png"
+function observer_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
-function cobblestone_update(temp,x,y){
-    if (ePowerTest(temp,x,y)){
-        //"images/cobblestone.png"
+function cobblestone_update(list,x,y){
+    if (ePowerTest(list,x,y)){
+        //
     }
     
-    return temp;
+    return list;
 }
 
 //!SECTION
@@ -493,9 +481,7 @@ function cobblestone_update(temp,x,y){
 
 
 //SECTION Structure code
-
-
-        // Set up event listeners
+// Set up event listeners
 function setupEventListeners() {
     // Block selection
     document.querySelectorAll('.block').forEach(block => {
@@ -530,8 +516,6 @@ function setupEventListeners() {
     document.getElementById('showArrayBtn').addEventListener('click', show2DArray);
     document.getElementById('clearBtn').addEventListener('click', clearGrid);
 }
-
-
 // Clear the entire grid
 function clearGrid() {
     // Reset the 2D array
@@ -551,7 +535,6 @@ function clearGrid() {
     document.getElementById('arrayDisplay').innerHTML = '';
     console.log('Grid cleared!');
 }
-
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', /*Initialize*/);
 
@@ -709,8 +692,9 @@ Variables/Parameters (ports):
     - Empty 0 : Not connected to anything (air block)
     - Empty 1 : Doesn't exist
     
-
 //!SECTION
+*/
+/*
 -----------------------------------------------------------------------------------------
 //NOTE  Array structure Expanded (4d):
 
