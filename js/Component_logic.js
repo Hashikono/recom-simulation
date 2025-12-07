@@ -1,5 +1,5 @@
 //Individual ports
-class ComponentPort { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
+class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
     constructor(ePow, rPow, blockType, io, priority){
         //Electric power
         this.ePow = ePow;
@@ -36,7 +36,7 @@ class ComponentPort { //ePow(bool), rPow(int), blockType(str), io(str), priority
 }
 
 //Block main structure
-class Block { //blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
+class Block { //blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4)
     constructor(blockType, direction, state, imgPower, portsList){
         //block name ("redstone_block")
         this.blockType = blockType;
@@ -87,7 +87,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //tests if the block has power
     //(Only applies to simulation)
     powerTest() { //boolean
-        if (north.ePower() || east.ePower() || south.ePower() || west.ePower()){
+        if (this.portsList[0].ePower() || this.portsList[1].ePower() || this.portsList[2].ePower() || this.portsList[3].ePower()){
             return true;
         }
         else{
@@ -130,62 +130,77 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
 }
 
-//Block Ref: getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
+//Port Ref:  new Port(ePow(bool), rPow(int), blockType(str), io(str), priority(bool))
+//           getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
+
+//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
+//           getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
 //           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
-//Port Ref: getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
 
 //SECTION Update/Analysis
 
 //generic empty block generator (borders will be air)
 function genEmptyBlock(){
-    return new Block("air", 1, 1, "off", [new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false), new ComponentPort(false, 0, "air", "output", false)]);
+    return new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
 }
 
 //block objects (begins with inititialization) | stores image sources from updates
 //Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-var blocksList = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-var imgList = Array.from({length:6}, () => Array.from({length:6}, 0));
+var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+var imgListV1 = Array.from({length:6}, () => Array.from({length:6}, ""));
 
 
 //Updates the blocks list (and image list)
 function update(){
-    //version one of blocks
-    let blocksV1 = blocksList;
     //version two of blocks (actively constructing)
-    let blocksV2 = [];
+    let blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+    //version two of images (debugging)
+    let imgListV2 = Array.from({length:6}, () => Array.from({length:6}, ""));
+
+    //main updater
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
-            if (blocksV1[r][c].getType() =="redstone_dust"){
-                redstone_dust(r,c);
+            //temp variables to update item @ [r][c] (index 0 = obj, index 1 = img)
+            let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
+
+            if (blocksV1[r][c].getType() =="redstone_block"){
+                temp = redstone_block_update(r,c);
+            } 
+            else if (blocksV1[r][c].getType() =="redstone_dust"){
+                temp = redstone_dust(r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_repeator"){
-                redstone_repeator(r,c);
+                temp = redstone_repeator(r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_comparator"){
-                redstone_comparator(r,c);
+                temp = redstone_comparator(r,c);
             } 
             else if (blocksV1[r][c].getType() =="redstone_lamp"){
-                redstone_lamp(r,c);
+                temp = redstone_lamp(r,c);
             } 
             else if (blocksV1[r][c].getType() =="oak_button"){
-                oak_button(r,c);
+                temp = oak_button(r,c);
             } 
             else if (blocksV1[r][c].getType() =="note_block"){
-                note_block(r,c);
+                temp = note_block(r,c);
             } 
             else if (blocksV1[r][c].getType() =="lever"){
-                lever(r,c);
+                temp = lever(r,c);
             } 
             else if (blocksV1[r][c].getType() =="observer"){
-                observer(r,c);
+                temp = observer(r,c);
             } 
             else if (blocksV1[r][c].getType() =="cobblestone"){
-                cobblestone(r,c);
+                temp = cobblestone(r,c);
             }
+            
+            blocksV2[r][c] = temp[0];
+            imgListV2[r][c] = temp[1];
         }
     }
 
-    blocksList = blocksV2;
+    blocksV1 = blocksV2;
+    imgLIstV1 = imgListV2;
 }   
 
 
@@ -206,8 +221,8 @@ function implement(){
             cell.id = `cell-${r}-${c}`;
                 //image
                 const image = document.createElement("img");
-                image.src = imgList[r][c];
-                image.alt = imgList[r][c];
+                image.src = imgListV1[r][c];
+                image.alt = imgListV1[r][c];
                 cell.appendChild(image);
             grid.appendChild(cell);
         }
@@ -218,59 +233,125 @@ function implement(){
 //!SECTION
 
 /*//SECTION Specific block update types
+//REVIEW create update functions for each block
 > Checks surrounding of the block in V1
     > Determine status in input/output type ports
 > update all port attributes of the block
 > update image if necessary (on/off)
+> returns a list - [new object, image string]
+
+//Port Ref:  new Port(ePow(bool), rPow(int), blockType(str), io(str), priority(bool))
+//           getEPower(bool) | getRPower(int) | getType(str) | getState(str) | getPrior(bool)
+
+//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), portsList(obj x4))
+//           getType(str) | getDirection(int) | getState(int) | getImgPower() | get(dir)Port(obj)
+//           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
+
+let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
 
 */
+//tests ePower on surrounding blocks
+function ePowerTest(x,y){
+    let power = false;
+    let testBlocks = [1,2,3,4];
+    if (x-1 < 0){
+        testBlocks.splice(testBlocks.indexOf(4),1);
+    }
+    if (x+1 > 6){
+        testBlocks.splice(testBlocks.indexOf(2),1);
+    }
+    if (y-1 < 0){
+        testBlocks.splice(testBlocks.indexOf(1),1);
+    }
+    if (x+1 > 6){
+        testBlocks.splice(testBlocks.indexOf(3),1);
+    }
+
+    for (let i = 0; i <testBlocks.length; i++){
+        if (testBlocks[i] == 1 && blocksV1[x][y].getNorthPort().getEPower()){
+            power = true;
+        }
+        else if (testBlocks[i] == 2 && blocksV1[x][y].getEastPort().getEPower()){
+            power = true;
+        }
+        else if (testBlocks[i] == 3 && blocksV1[x][y].getSouthPort().getEPower()){
+            power = true;
+        }
+        else if (testBlocks[i] == 4 && blocksV1[x][y].getWestPort().getEPower()){
+            power = true;
+        }
+    }
+
+    return power;
+}
+
+function redstone_block_update(x,y){
+    if (ePowerTest(x,y)){
+        //images/redstone_block.png
+    }
+}
 
 function redstone_dust_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function redstone_repeator_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function redstone_comparator_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function redstone_lamp_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function oak_button_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function note_block_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function lever_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/lever_off.png
+    }
 }
 
 function observer_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/.png
+    }
 }
 
 function cobblestone_update(x,y){
-    //
+    if (ePowerTest(x,y)){
+        //images/cobblestone.png
+    }
 }
 
 //!SECTION
 
-/*
-//REVIEW Rename all images to the new format (only the ones that deal with directions etc.)
-//IMAGE STRUCTURE: (block type)_(direction)_(state [starts at 1])_(s on/off).png
 
-//continue starting from redstone_dust
 
-//REVIEW create update functions for each block
-*/
+
+
+
 
 
 
@@ -497,124 +578,48 @@ Variables/Parameters (ports):
 
 //!SECTION
 -----------------------------------------------------------------------------------------
-//SECTION Array structure (2d & 5d):
+//NOTE  Array structure Expanded (4d):
 
-//NOTE [1D] blocks
-[
-    row (list)
-]
-
-//NOTE [2D] blocks
 [
     [
-        block (string)
-    ]
-]
-
----------------------------------------------(SPLIT)
-//NOTE translation to objects rows
-[
-    row (list)
-]
-
-//NOTE translation to objects
-[
-    [
-        block (object)
-    ]
-]
-
-//NOTE translation individual ports/directions
-[ 
-    [
-        [
-            port_1 (object),
-            port_2 (object),
-            port_3 (object),
-            port_4 (object)
-        ]
-    ]
-]
-
-//NOTE data of individual ports
-[ 
-    [
-        [ (BLOCKS - can individually access all info below)
+        {
+            blockType(str),
+            direction(int),
+            state(int),
+            imgPower(str),
             [
                 e (integer),
                 r (integer),
                 typ (string),
-                io (list)
+                state (string),
+                priority (boolean)
             ],
             [
                 e (integer),
                 r (integer),
                 typ (string),
-                io (list)
+                state (string),
+                priority (boolean)
             ],
             [
                 e (integer),
                 r (integer),
                 typ (string),
-                io (list)
+                state (string),
+                priority (boolean)
             ],
             [
                 e (integer),
                 r (integer),
                 typ (string),
-                io (list)
+                state (string),
+                priority (boolean)
             ]
-        ]
-    ]
-]
-
-//NOTE Io list extended
-[ 
-    [
-        [ 
-            [
-                e (integer),
-                r (integer),
-                typ (string),
-                [
-                    state (string),
-                    priority (boolean)
-                ]
-            ],
-            [
-                e (integer),
-                r (integer),
-                typ (string),
-                [
-                    state (string),
-                    priority (boolean)
-                ]
-            ],
-            [
-                e (integer),
-                r (integer),
-                typ (string),
-                [
-                    state (string),
-                    priority (boolean)
-                ]
-            ],
-            [
-                e (integer),
-                r (integer),
-                typ (string),
-                [
-                    state (string),
-                    priority (boolean)
-                ]
-            ]
-        ]
+        }
         - ADDING MORE BLOCKS (AND THEIR PORTS)
     ]
-    - ADDING MORE ROWS (AND THEIR BLOCKS)
 ]
 
-//!SECTION
 -----------------------------------------------------------------------------------------
 */
 
