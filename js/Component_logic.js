@@ -116,10 +116,22 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     //no parameters - converts attributes to image path
     //REVIEW finish img path assembly
     setImg(){ //string
+        
+        document.querySelectorAll('.grid-container').forEach(cell => {
+            cell.addEventListener('click', function() {
+                
+                const row = parseInt(this.dataset.row);
+                const col = parseInt(this.dataset.col);
+                
+                placeBlock(row, col, selectedBlock);
+            });
+        });
+
+
         if (this.blockType = "redstone_block"){
             this.img = "images/redstone_block.png";
         }
-
+        
         else if (this.blockType = "redstone_dust"){
             //"images/redstone_dust_12_off.png", "images/redstone_dust_12_on.png", "images/redstone_dust_13_off.png", "images/redstone_dust_13_on.png", "images/redstone_dust_14_off.png", "images/redstone_dust_14_on.png", "images/redstone_dust_23_off.png", "images/redstone_dust_23_on.png", "images/redstone_dust_24_off.png", "images/redstone_dust_24_on.png", "images/redstone_dust_34_off.png", "images/redstone_dust_34_on.png", "images/redstone_dust_123_off.png", "images/redstone_dust_123_on.png", "images/redstone_dust_124_off.png", "images/redstone_dust_124_on.png", "images/redstone_dust_134_off.png", "images/redstone_dust_134_on.png", "images/redstone_dust_234_off.png", "images/redstone_dust_234_on.png", "images/redstone_dust_1234_off.png", "images/redstone_dust_1234_on.png"
         
@@ -344,6 +356,50 @@ function implement(){
 let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
 */
 
+//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
+//Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
+function testAbsurdity(option){
+    let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
+    let absurdText = JSON.stringify(blocksV1, null, 0);
+
+    /*
+    const characters: 
+    new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
+    
+    dynamic characters(ish): air | 1234 | 1 | off | images/air.png | false | 
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+    */
+    
+    //1 = character count of declaration
+    if (option = 1){
+        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
+        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
+        
+        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
+        
+        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
+        
+        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
+        
+        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
+
+        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
+    } 
+
+    //2 = one line JSON 
+    else if (option = 2) {
+        return absurdText;
+    } 
+
+    //3 = organized JSON
+    else if (option = 3) {
+        return organizedAbsurdText;
+    }
+}
+
 //tests ePower on surrounding blocks
 function ePowerTest(ls,x,y){
     let power = false;
@@ -513,7 +569,6 @@ function setupEventListeners() {
     });
 
     // Control buttons
-    document.getElementById('showArrayBtn').addEventListener('click', show2DArray);
     document.getElementById('clearBtn').addEventListener('click', clearGrid);
 }
 // Clear the entire grid
