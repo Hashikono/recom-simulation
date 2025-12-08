@@ -109,14 +109,19 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         this.state = x;
     }
 
-    setImgPower(x){ //string
-        this.imgPower = x;
+    setImgPower(){ //string
+        if (this.powerTest()){
+            this.imgPower = "on";
+        }
     }
 
     //no parameters - converts attributes to image path
     //REVIEW finish img path assembly
     setImg(){ //string
-        
+        //images/redstone_repeator_13_1_off.png
+
+        img = `images/${this.blockType}_${this.direction}_${this.state}_${this.imgPower}.png`;
+
         document.querySelectorAll('.grid-container').forEach(cell => {
             cell.addEventListener('click', function() {
                 
@@ -126,56 +131,8 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
                 placeBlock(row, col, selectedBlock);
             });
         });
-
-
-        if (this.blockType = "redstone_block"){
-            this.img = "images/redstone_block.png";
-        }
         
-        else if (this.blockType = "redstone_dust"){
-            //"images/redstone_dust_12_off.png", "images/redstone_dust_12_on.png", "images/redstone_dust_13_off.png", "images/redstone_dust_13_on.png", "images/redstone_dust_14_off.png", "images/redstone_dust_14_on.png", "images/redstone_dust_23_off.png", "images/redstone_dust_23_on.png", "images/redstone_dust_24_off.png", "images/redstone_dust_24_on.png", "images/redstone_dust_34_off.png", "images/redstone_dust_34_on.png", "images/redstone_dust_123_off.png", "images/redstone_dust_123_on.png", "images/redstone_dust_124_off.png", "images/redstone_dust_124_on.png", "images/redstone_dust_134_off.png", "images/redstone_dust_134_on.png", "images/redstone_dust_234_off.png", "images/redstone_dust_234_on.png", "images/redstone_dust_1234_off.png", "images/redstone_dust_1234_on.png"
         
-        }
-
-        else if (this.blockType = "redstone_repeator"){
-            //"images/redstone_repeator_13_1_off.png", "images/redstone_repeator_13_1_on.png", "images/redstone_repeator_13_2_off.png", "images/redstone_repeator_13_2_on.png", "images/redstone_repeator_13_3_off.png", "images/redstone_repeator_13_3_on.png", "images/redstone_repeator_13_4_off.png", "images/redstone_repeator_13_4_on.png", "images/redstone_repeator_24_1_off.png", "images/redstone_repeator_24_1_on.png", "images/redstone_repeator_24_2_off.png", "images/redstone_repeator_24_2_on.png", "images/redstone_repeator_24_3_off.png", "images/redstone_repeator_24_3_on.png", "images/redstone_repeator_24_4_off.png", "images/redstone_repeator_24_4_on.png", "images/redstone_repeator_31_1_off.png", "images/redstone_repeator_31_1_on.png", "images/redstone_repeator_31_2_off.png", "images/redstone_repeator_31_2_on.png", "images/redstone_repeator_31_3_off.png", "images/redstone_repeator_31_3_on.png", "images/redstone_repeator_31_4_off.png", "images/redstone_repeator_31_4_on.png", "images/redstone_repeator_42_1_off.png", "images/redstone_repeator_42_1_on.png", "images/redstone_repeator_42_2_off.png", "images/redstone_repeator_42_2_on.png", "images/redstone_repeator_42_3_off.png", "images/redstone_repeator_42_3_on.png", "images/redstone_repeator_42_4_off.png", "images/redstone_repeator_42_4_on.png"
-
-        }
-
-        else if (this.blockType = "redstone_comparator"){
-            //"images/redstone_comparator_13_1_off.png", "images/redstone_comparator_13_1_on.png", "images/redstone_comparator_13_2_off.png", "images/redstone_comparator_13_2_on.png", "images/redstone_comparator_24_1_off.png", "images/redstone_comparator_24_1_on.png", "images/redstone_comparator_24_2_off.png", "images/redstone_comparator_24_2_on.png", "images/redstone_comparator_31_1_off.png", "images/redstone_comparator_31_1_on.png", "images/redstone_comparator_31_2_off.png", "images/redstone_comparator_31_2_on.png", "images/redstone_comparator_42_1_off.png", "images/redstone_comparator_42_1_on.png", "images/redstone_comparator_42_2_off.png", "images/redstone_comparator_42_2_on.png"
-
-        }
-
-        else if (this.blockType = "redstone_lamp"){
-            //"images/redstone_lamp_off.png", "images/redstone_lamp_on.png"
-            
-        }
-
-        else if (this.blockType = "oak_button"){
-            //"images/oak_button_off.png", "images/oak_button_on.png"
-
-        }
-
-        else if (this.blockType = "note_block"){
-            //"images/note_block.png"
-        
-        }
-
-        else if (this.blockType = "lever"){
-            //"images/lever_off.png", "images/lever_on.png"
-
-        }
-
-        else if (this.blockType = "observer"){
-            //"images/observer_13_off.png", "images/observer_13_on.png", "images/observer_24_off.png", "images/observer_24_on.png", "images/
-        
-        }
-
-        else if (this.blockType = "cobblestone"){
-            //"images/cobblestone.png"
-        
-        }
 
     }
 
@@ -196,9 +153,11 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         return portsList[3];
     }
 
-    //tests if the block has power
+    //tests if the block has power (e/r)
     //(Only applies to simulation)
-    powerTest() { //boolean
+    //REVIEW finish making this dynamic
+    powerTest(x) { //boolean
+        //test()[`d${method}`]();  // where method is "a" or "b"
         if (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower()){
             return true;
         }
