@@ -110,30 +110,19 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     }
 
     setImgPower(){ //string
-        if (this.powerTest()){
+        if (this.powerTest("r")){
             this.imgPower = "on";
+        }
+        else {
+            this.imgPower = "off";
         }
     }
 
     //no parameters - converts attributes to image path
-    //REVIEW finish img path assembly
     setImg(){ //string
         //images/redstone_repeator_13_1_off.png
-
+        this.setImgPower();
         img = `images/${this.blockType}_${this.direction}_${this.state}_${this.imgPower}.png`;
-
-        document.querySelectorAll('.grid-container').forEach(cell => {
-            cell.addEventListener('click', function() {
-                
-                const row = parseInt(this.dataset.row);
-                const col = parseInt(this.dataset.col);
-                
-                placeBlock(row, col, selectedBlock);
-            });
-        });
-        
-        
-
     }
 
     //get methods for port objects
@@ -154,15 +143,16 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     }
 
     //tests if the block has power (e/r)
-    //(Only applies to simulation)
-    //REVIEW finish making this dynamic
     powerTest(x) { //boolean
-        //test()[`d${method}`]();  // where method is "a" or "b"
-        if (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower()){
+        //merely tests existence, doesn't set anything
+        if (x == "e" && (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower())){
+            return true;
+        }
+        if (x == "r" && (getNorthPort().getRPower() > 0 || getEastPort().getRPower() > 0 || getSouthPort().getRPower() > 0 || getWestPort().getRPower() > 0)){
             return true;
         }
         else{
-            console.log("No power detected");
+            console.log(`No ${x.toUpperCase()} detected`);
         }
     }
 
@@ -189,7 +179,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     }
 
     //returns bool value if block has a priority port (mainly for redstone_dust)
-    priorityExistence(){ //boolean
+    /*priorityExistence(){ //boolean
         let existence = false;
         for (let i = 0; i < this.portsList.length; i++){
             if (this.portsList[i].getPrior() == true){
@@ -197,27 +187,27 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
             }
         }
         return existence;
-    }
-
+    }*/
 }
+
 
 //Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
 //           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
 //Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
-//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str) | get(dir)Port(obj)
-//           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
-//           *setImg() has no parameters
+//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str)
+//           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
+//           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
+
 
 //SECTION Update/Analysis
-
+//REVIEW Should I be generic and include a useless init() function...
 //generic empty block generator (borders will be air)
 function genEmptyBlock(){
     return new Block("air", 1234, 1, "off", "images/air.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
 }
 
 //block objects (begins with inititialization) | stores image sources from updates
-//Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 
@@ -227,37 +217,35 @@ function update(){
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
             //temp variables to update item @ [r][c] (index 0 = obj, index 1 = img)
-            let temp = new Block("air", 1, 1, "off", "images/air.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
-
             if (blocksV1[r][c].getBlockType() =="redstone_block"){
-                redstone_block_update(temp,r,c);
+                redstone_block_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_dust"){
-                redstone_dust(temp,r,c);
+                redstone_dust(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_repeator"){
-                redstone_repeator(temp,r,c);
+                redstone_repeator(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_comparator"){
-                redstone_comparator(temp,r,c);
+                redstone_comparator(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_lamp"){
-                redstone_lamp(temp,r,c);
+                redstone_lamp(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="oak_button"){
-                oak_button(temp,r,c);
+                oak_button(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="note_block"){
-                note_block(temp,r,c);
+                note_block(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="lever"){
-                lever(temp,r,c);
+                lever(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="observer"){
-                observer(temp,r,c);
+                observer(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="cobblestone"){
-                cobblestone(temp,r,c);
+                cobblestone(r,c);
             }
             
             blocksV2[r][c] = temp[0];
@@ -308,9 +296,9 @@ function implement(){
 //           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
 //Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
-//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str) | get(dir)Port(obj)
-//           powerTest(bool) | travelling/fixedPowerOutput(int) | priorityExistence(bool)
-//           *setImg() has no parameters
+//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str)
+//           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
+//           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
 let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
 */
@@ -360,33 +348,26 @@ function testAbsurdity(option){
 }
 
 //tests ePower on surrounding blocks
-function ePowerTest(ls,x,y){
+function ePowerTest(y,x){
     let power = false;
     let testBlocks = [1,2,3,4];
-    if (x-1 < 0){
-        testBlocks.splice(testBlocks.indexOf(4),1);
-    }
-    if (x+1 > 6){
-        testBlocks.splice(testBlocks.indexOf(2),1);
-    }
-    if (y-1 < 0){
-        testBlocks.splice(testBlocks.indexOf(1),1);
-    }
-    if (x+1 > 6){
-        testBlocks.splice(testBlocks.indexOf(3),1);
-    }
+
+    if (x-1 < 0) testDir.splice(testDir.indexOf(4),1);
+    if (x+1 > 6) testDir.splice(testDir.indexOf(2),1);
+    if (y-1 < 0) testDir.splice(testDir.indexOf(1),1);
+    if (y+1 > 6) testDir.splice(testDir.indexOf(3),1);
 
     for (let i = 0; i <testBlocks.length; i++){
-        if (testBlocks[i] == 1 && blocksV1[x][y].getNorthPort().getEPower()){
+        if (testBlocks[i] == 1 && blocksV1[y][x].getNorthPort().getEPower()){
             power = true;
         }
-        else if (testBlocks[i] == 2 && blocksV1[x][y].getEastPort().getEPower()){
+        else if (testBlocks[i] == 2 && blocksV1[y][x].getEastPort().getEPower()){
             power = true;
         }
-        else if (testBlocks[i] == 3 && blocksV1[x][y].getSouthPort().getEPower()){
+        else if (testBlocks[i] == 3 && blocksV1[y][x].getSouthPort().getEPower()){
             power = true;
         }
-        else if (testBlocks[i] == 4 && blocksV1[x][y].getWestPort().getEPower()){
+        else if (testBlocks[i] == 4 && blocksV1[y][x].getWestPort().getEPower()){
             power = true;
         }
     }
@@ -394,92 +375,98 @@ function ePowerTest(ls,x,y){
     //sets ePower for all ports
     //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
     if (power){
-        ls[0].getNorthPort().setEPower(true);
-        ls[0].getEastPort().setEPower(true);
-        ls[0].getSouthPort().setEPower(true);
-        ls[0].getWestPort().setEPower(true);
+        blocksV2[y][x].getNorthPort().setEPower(true);
+        blocksV2[y][x].getEastPort().setEPower(true);
+        blocksV2[y][x].getSouthPort().setEPower(true);
+        blocksV2[y][x].getWestPort().setEPower(true);
     }
     return power;
 }
 
-function redstone_block_update(list,x,y){
-    if (ePowerTest(list,x,y)){
-        //
+function redstone_block_update(y,x){
+    if (ePowerTest(y,x)){
+        blocksV2[y][x] = blocksV1[y][x];
     }
-    
-    return list;
+    blocksV2[y][x].setImg();
 }
 
-function redstone_dust_update(list,x,y){
-    if (ePowerTest(list,x,y)){
-        //
+function redstone_dust_update(y,x){
+    if (ePowerTest(y,x)){
+        //direction availability - initial cleaning of edge "blocks"
+        let dirAvail = [1,2,3,4];
+        if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
+        if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
+        if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
+        if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
+
+        //direction priority - testing priority in surrounding blocks
+        let dirPrior = [];
+        for (let direct in dirAvail){
+            if (direct == 1 && blocksV1[y-1][x]) dirPrior.push(1);
+            if (direct == 2 && blocksV1[y][x+1]) dirPrior.push(1);
+            if (direct == 3 && blocksV1[y+1][x]) dirPrior.push(1);
+            if (direct == 4 && blocksV1[y][x-1]) dirPrior.push(1);
+        }
+
+
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function redstone_repeator_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function redstone_repeator_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function redstone_comparator_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function redstone_comparator_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function redstone_lamp_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function redstone_lamp_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function oak_button_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function oak_button_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function note_block_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function note_block_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function lever_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function lever_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function observer_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function observer_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
-function cobblestone_update(list,x,y){
-    if (ePowerTest(list,x,y)){
+function cobblestone_update(y,x){
+    if (ePowerTest(y,x)){
         //
+        blocksV2[y][x].setImg();
     }
-    
-    return list;
 }
 
 //!SECTION
@@ -512,13 +499,9 @@ function setupEventListeners() {
         });
     });
 
-    // Grid cell placement
-    document.querySelectorAll('.grid-cell').forEach(cell => {
+    //grid cell placement
+    document.querySelectorAll('.grid-container').forEach(cell => {
         cell.addEventListener('click', function() {
-            if (!selectedBlock) {
-                alert('Please select a block first!');
-                return;
-            }
             
             const row = parseInt(this.dataset.row);
             const col = parseInt(this.dataset.col);
@@ -549,6 +532,7 @@ function clearGrid() {
     document.getElementById('arrayDisplay').innerHTML = '';
     console.log('Grid cleared!');
 }
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', /*Initialize*/);
 
