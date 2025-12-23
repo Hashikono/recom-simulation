@@ -144,15 +144,28 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
     //tests if the block has power (e/r)
     powerTest(x) { //boolean
-        //merely tests existence, doesn't set anything
+        //tests and updates ePower
         if (x == "e" && (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower())){
+            portsList[0].setEPower(true);
+            portsList[1].setEPower(true);
+            portsList[2].setEPower(true);
+            portsList[3].setEPower(true);
             return true;
         }
+        else {
+            portsList[0].setEPower(false);
+            portsList[1].setEPower(false);
+            portsList[2].setEPower(false);
+            portsList[3].setEPower(false);
+            return false
+        }
+
+        //only tests rPower
         if (x == "r" && (getNorthPort().getRPower() > 0 || getEastPort().getRPower() > 0 || getSouthPort().getRPower() > 0 || getWestPort().getRPower() > 0)){
             return true;
         }
         else{
-            console.log(`No ${x.toUpperCase()} detected`);
+            return false;
         }
     }
 
@@ -201,11 +214,156 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
 
 //SECTION Update/Analysis
-//REVIEW Should I be generic and include a useless init() function...
-//generic empty block generator (borders will be air)
-function genEmptyBlock(){
-    return new Block("air", 1234, 1, "off", "images/air.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
+
+//tests and returns for available directions
+function edgeParser(y,x){
+    let dirAvail = [1,2,3,4];
+    if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
+    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
+    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
+    if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
+    return dirAvail;
 }
+
+//generic block creator (genEmpty = default/single-use)
+function genEmptyBlock(){
+    return new Block("air", 1234, 1, "off", "images/air_1234_1_off.png", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]);
+}
+
+function genBlock(block,y,x){
+    let dirTest = edgeParser(y,x);
+
+    //constructing surrounding blocks list
+    let surBlock = ["air","air","air","air"];
+    if(dirTest.includes(1)){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
+    if(dirTest.includes(2)){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
+    if(dirTest.includes(3)){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
+    if(dirTest.includes(4)){surBlock[3] = blocksV1[y][x-1].getBlockType(); }
+
+    //implementation
+    if (block = "air"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/air_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "none", false), 
+                new Port(false, 0, surBlock[1], "none", false), 
+                new Port(false, 0, surBlock[2], "none", false), 
+                new Port(false, 0, surBlock[3], "none", false)
+            ]);
+    }
+    else if (block = "redstone_block"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/redstone_block_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "redstone_dust"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/redstone_dust_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "redstone_repeator"){
+        return new Block(
+            block, 31, 1, "off", 
+            "images/redstone_repeator_31_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "redstone_comparator"){
+        return new Block(
+            block, 31, 1, "off", 
+            "images/redstone_comparator_31_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "redstone_lamp"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/redstone_lamp_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "oak_button"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/oak_button_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "note_block"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/note_block_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "lever"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/lever_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "output", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "observer"){
+        return new Block(
+            block, 31, 1, "off", 
+            "images/observer_31_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "input", false), 
+                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[2], "output", false), 
+                new Port(false, 0, surBlock[3], "output", false)
+            ]);
+    }
+    else if (block = "cobblestone"){
+        return new Block(
+            block, 1234, 1, "off", 
+            "images/cobblestone_1234_1_off.png", 
+            [
+                new Port(true, 0, surBlock[0], "input", false), 
+                new Port(true, 0, surBlock[1], "input", false), 
+                new Port(true, 0, surBlock[2], "input", false), 
+                new Port(true, 0, surBlock[3], "input", false)
+            ]);
+    }
+}
+
 
 //block objects (begins with inititialization) | stores image sources from updates
 var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
@@ -300,7 +458,7 @@ function implement(){
 //           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
 //           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air.png"];
+let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air_1234_1_off.png"];
 */
 
 //this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
@@ -313,7 +471,7 @@ function testAbsurdity(option){
     const characters: 
     new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
     
-    dynamic characters(ish): air | 1234 | 1 | off | images/air.png | false | 
+    dynamic characters(ish): air | 1234 | 1 | off | images/air_1234_1_off.png | false | 
                         false | 0 | air | output | false
                         false | 0 | air | output | false
                         false | 0 | air | output | false
@@ -350,36 +508,16 @@ function testAbsurdity(option){
 //tests ePower on surrounding blocks
 function ePowerTest(y,x){
     let power = false;
-    let testBlocks = [1,2,3,4];
+    let testBlocks = edgeParser(y,x);
 
-    if (x-1 < 0) testDir.splice(testDir.indexOf(4),1);
-    if (x+1 > 6) testDir.splice(testDir.indexOf(2),1);
-    if (y-1 < 0) testDir.splice(testDir.indexOf(1),1);
-    if (y+1 > 6) testDir.splice(testDir.indexOf(3),1);
-
-    for (let i = 0; i <testBlocks.length; i++){
-        if (testBlocks[i] == 1 && blocksV1[y][x].getNorthPort().getEPower()){
-            power = true;
-        }
-        else if (testBlocks[i] == 2 && blocksV1[y][x].getEastPort().getEPower()){
-            power = true;
-        }
-        else if (testBlocks[i] == 3 && blocksV1[y][x].getSouthPort().getEPower()){
-            power = true;
-        }
-        else if (testBlocks[i] == 4 && blocksV1[y][x].getWestPort().getEPower()){
-            power = true;
-        }
-    }
+    if (testBlocks.includes(1) && blocksV1[y-1][x].getNorthPort().getEPower()){power = true; }
+    else if (testBlocks.includes(2) && blocksV1[y][x+1].getEastPort().getEPower()){power = true; }
+    else if (testBlocks.includes(3) && blocksV1[y+1][x].getSouthPort().getEPower()){power = true; }
+    else if (testBlocks.includes(4) && blocksV1[y][x-1].getWestPort().getEPower()){power = true; }
 
     //sets ePower for all ports
     //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
-    if (power){
-        blocksV2[y][x].getNorthPort().setEPower(true);
-        blocksV2[y][x].getEastPort().setEPower(true);
-        blocksV2[y][x].getSouthPort().setEPower(true);
-        blocksV2[y][x].getWestPort().setEPower(true);
-    }
+
     return power;
 }
 
@@ -393,21 +531,24 @@ function redstone_block_update(y,x){
 function redstone_dust_update(y,x){
     if (ePowerTest(y,x)){
         //direction availability - initial cleaning of edge "blocks"
-        let dirAvail = [1,2,3,4];
-        if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
-        if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
-        if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
-        if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
+        let dirTest = edgeParser(y,x);
 
         //direction priority - testing priority in surrounding blocks
         let dirPrior = [];
-        for (let direct in dirAvail){
+        for (let direct in dirTest){
             if (direct == 1 && blocksV1[y-1][x]) dirPrior.push(1);
             if (direct == 2 && blocksV1[y][x+1]) dirPrior.push(1);
             if (direct == 3 && blocksV1[y+1][x]) dirPrior.push(1);
             if (direct == 4 && blocksV1[y][x-1]) dirPrior.push(1);
         }
 
+        //priority exists
+        if(dirPrior.length > 0){
+            
+        } 
+        else {
+
+        }
 
         blocksV2[y][x].setImg();
     }
@@ -669,14 +810,15 @@ Variables/Parameters (ports):
     - "cobblestone"
     - "air"
 
-*io - list[type, priority]
-    - State - string
-        - "input" - input port
-        - "output" - output port
+*io - string
+    - "input" - input port
+    - "output" - output port
+    - "none" - regular port
+    *outputs flow into inputs
 
-    - Priority(output ports) - boolean
-        - true - priority connection 
-        - false - no priority or empty port
+*Priority(output ports) - boolean
+    - true - priority connection 
+    - false - no priority or empty port
 
 -----------------------------------------------------------------------------------------
 //NOTE Data storage (examples)
