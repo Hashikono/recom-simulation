@@ -152,22 +152,32 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
             portsList[3].setEPower(true);
             return true;
         }
-        else {
+        else if (x == "e") {
             portsList[0].setEPower(false);
             portsList[1].setEPower(false);
             portsList[2].setEPower(false);
             portsList[3].setEPower(false);
             return false
         }
-
         //only tests rPower
-        if (x == "r" && (getNorthPort().getRPower() > 0 || getEastPort().getRPower() > 0 || getSouthPort().getRPower() > 0 || getWestPort().getRPower() > 0)){
+        else if (x == "r" && (getNorthPort().getRPower() > 0 || getEastPort().getRPower() > 0 || getSouthPort().getRPower() > 0 || getWestPort().getRPower() > 0)){
             return true;
         }
-        else{
+        else if (x == "r") {
             return false;
         }
     }
+
+    /*tests if the block has priority (outputs lists if it does) [deprecated due to exclusive use outside scope]
+    priorityTest(){
+        let dirPrior = [];
+        if (blocksV1[y-1][x]) dirPrior.push(1);
+        if (blocksV1[y][x+1]) dirPrior.push(2);
+        if (blocksV1[y+1][x]) dirPrior.push(3);
+        if (blocksV1[y][x-1]) dirPrior.push(4);
+
+        return dirPrior;
+    }*/
 
     //returns highest possible redstone power ouput value (minus one for spacing)
     travellingPowerOutput(){ //integer
@@ -204,16 +214,51 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 }
 
 
-//Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
-//           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
-
-//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
-//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str)
-//           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
-//           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
-
-
 //SECTION Update/Analysis
+//...
+//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
+//Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
+function testAbsurdity(option){
+    let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
+    let absurdText = JSON.stringify(blocksV1, null, 0);
+
+    /*
+    const characters: 
+    new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
+    
+    dynamic characters(ish): air | 1234 | 1 | off | images/air_1234_1_off.png | false | 
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+    */
+    
+    //1 = character count of declaration
+    if (option = 1){
+        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
+        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
+        
+        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
+        
+        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
+        
+        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
+        
+        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
+
+        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
+    } 
+
+    //2 = one line JSON 
+    else if (option = 2) {
+        return absurdText;
+    } 
+
+    //3 = organized JSON
+    else if (option = 3) {
+        return organizedAbsurdText;
+    }
+}
 
 //tests and returns for available directions
 function edgeIdentifier(y,x){
@@ -223,6 +268,21 @@ function edgeIdentifier(y,x){
     if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
     if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
     return dirAvail;
+}
+
+//tests ePower on surrounding blocks
+function ePowerTest(y,x){
+    let power = false;
+    let testBlocks = edgeIdentifier(y,x);
+
+    //sets ePower for all ports
+    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
+    if (testBlocks.includes(1) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y-1][x].powerTest("e")){power = true; }
+    else if (testBlocks.includes(2) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x+1].powerTest("e")){power = true; }
+    else if (testBlocks.includes(3) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y+1][x].powerTest("e")){power = true; }
+    else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
+
+    return power;
 }
 
 //generic block creator (genEmpty = default/single-use)
@@ -372,7 +432,7 @@ function genBlock(block,y,x){
     }
 }
 
-//block objects (begins with inititialization) | stores image sources from updates
+//blocksV1 for setting genBlocks & original data | blocksV2 for updating data and immediately copying it over
 var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 var blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
 
@@ -418,7 +478,6 @@ function update(){
     blocksV1 = structuredClone(blocksV2);
 }   
 
-
 //Implements the blocks list into the grid (HTML creation)
 function implement(){
     //empties current div
@@ -444,90 +503,34 @@ function implement(){
     }
 }
 
-
 //!SECTION
 
+
 /*//SECTION Specific block update types
-//REVIEW create update functions for each block
-> Checks surrounding of the block in V1
-    > Determine status in input/output type ports
-> update all port attributes of the block
-> update image if necessary (on/off)
-> returns a list - [new object, image string]
+> direction/state attributes
+> surrounding of the block in V1
+> all port attributes of the block (input/output)
+> image if necessary (on/off)
 
-//Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
-//           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
-//Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
-//           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str)
-//           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
-//           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-let temp = [new Block("air", 1, 1, "off", [new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false), new Port(false, 0, "air", "output", false)]), "images/air_1234_1_off.png"];
+Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
+           s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
+
+Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), img(str), portsList(obj x4))
+           s/getBlockType(str) | s/getDirection(int) | s/getState(int) | s/getImgPower(str) | s/getImg(str)
+           get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
+           *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
+
+Function Ref: testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x) genEmptyBlock() | genBlock(block,y,x)
+
+Implementation Ref: update() | implement()
+
 */
-
-//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
-//Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
-function testAbsurdity(option){
-    let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
-    let absurdText = JSON.stringify(blocksV1, null, 0);
-
-    /*
-    const characters: 
-    new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
-    
-    dynamic characters(ish): air | 1234 | 1 | off | images/air_1234_1_off.png | false | 
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-    */
-    
-    //1 = character count of declaration
-    if (option = 1){
-        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
-        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
-        
-        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
-        
-        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
-        
-        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
-        
-        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
-
-        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
-    } 
-
-    //2 = one line JSON 
-    else if (option = 2) {
-        return absurdText;
-    } 
-
-    //3 = organized JSON
-    else if (option = 3) {
-        return organizedAbsurdText;
-    }
-}
-
-//tests ePower on surrounding blocks
-function ePowerTest(y,x){
-    let power = false;
-    let testBlocks = edgeIdentifier(y,x);
-
-    //sets ePower for all ports
-    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
-    if (testBlocks.includes(1) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y-1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(2) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x+1].powerTest("e")){power = true; }
-    else if (testBlocks.includes(3) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y+1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
-
-    return power;
-}
 
 function redstone_block_update(y,x){
     if (ePowerTest(y,x)){
-        blocksV2[y][x] = blocksV1[y][x];
+        blocksV2[y][x] = structuredClone(blocksV1[y][x]);
     }
     blocksV2[y][x].setImg();
 }
@@ -539,21 +542,54 @@ function redstone_dust_update(y,x){
 
         //direction priority - testing priority in surrounding blocks
         let dirPrior = [];
-        for (let direct in dirTest){
-            if (direct == 1 && blocksV1[y-1][x]) dirPrior.push(1);
-            if (direct == 2 && blocksV1[y][x+1]) dirPrior.push(1);
-            if (direct == 3 && blocksV1[y+1][x]) dirPrior.push(1);
-            if (direct == 4 && blocksV1[y][x-1]) dirPrior.push(1);
+        if (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getPrior()) dirPrior.push(1);
+        if (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getPrior()) dirPrior.push(2);
+        if (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getPrior()) dirPrior.push(3);
+        if (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getPrior()) dirPrior.push(4);
+        
+        //direction establishment
+        if (dirPrior.length == 0 || dirPrior.length == 4){
+            blocksV1[y][x].setDirection(1234);
+        }
+        else if (dirPrior.length == 1){
+            if (dirPrior[0] == 1 || dirPrior[0] == 3){
+                blockV1[y][x].setDirection(13);
+            }
+            else if (dirPrior[0] == 2 || dirPrior[0] == 4){
+                blockV1[y][x].setDirection(24);
+            }
+        }
+        else if (dirPrior.length == 2 || dirPrior.length == 3){
+            blockV1[y][x].setDirection(dirPrior.join(""));
         }
 
-        //priority exists
-        if(dirPrior.length > 0){
-            
-        } 
+        //update ports
+        //REVIEW tests which directions are available and check if they are input/output and set the ports acordingly...
+
+        //on/off establishment
+        if (
+            (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getIo() == "output" && blocksV1[y-1][x].getSouthPort().getRPower() > 0) || 
+            (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getIo() == "output" && blocksV1[y][x+1].getWestPort().getRPower() > 0) ||
+            (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getIo() == "output" && blocksV1[y+1][x].getNorthPort().getRPower() > 0) ||
+            (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getIo() == "output" && blocksV1[y][x-1].getEastPort().getRPower() > 0)
+        ){
+            blocksV2.setState("on");
+        }
         else {
-
+            blocksV2.setState("off");
         }
 
+
+        /* 
+        block, 1234, 1, "off", 
+            "images/redstone_dust_1234_1_off.png", 
+            [
+                new Port(false, 0, surBlock[0], "input", true), 
+                new Port(false, 0, surBlock[1], "input", true), 
+                new Port(false, 0, surBlock[2], "input", true), 
+                new Port(false, 0, surBlock[3], "input", true)
+            ]);
+        */
         blocksV2[y][x].setImg();
     }
 }
