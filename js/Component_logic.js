@@ -13,6 +13,11 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
         this.priority = priority;
     }
 
+    //clone method -_-
+    clone() {
+        return new Port(this.ePow, this.rPow, this.onBlockType, this.io, this.priority);
+    }
+
     //get methods for port data
     getEPower() { //boolean
         return this.sePow; 
@@ -75,6 +80,11 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         this.portsList = portsList;
     }
 
+    //clone method due to structuredClone() being annoying
+    clone() {
+        return new Block(this.blockType, this.direction, this.state, this.imgPower, this.img, this.portsList.map(port => port.clone()));
+    }
+
     //get methods for general block data (mainly for image conversion)
     getBlockType(){ //string
         return this.blockType;
@@ -94,6 +104,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
     getImg(){ //string
         return this.img;
+        //return "images/air_1234_1_off.png";
     }
 
     //set methods for general block data
@@ -127,40 +138,40 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
     //get methods for port objects
     getNorthPort(){ //object
-        return portsList[0];
+        return this.portsList[0];
     }
 
     getEastPort(){ //object
-        return portsList[1];
+        return this.portsList[1];
     }
 
     getSouthPort(){ //object
-        return portsList[2];
+        return this.portsList[2];
     }
 
     getWestPort(){ //object
-        return portsList[3];
+        return this.portsList[3];
     }
 
     //tests if the block has power (e/r)
     powerTest(x) { //boolean
         //tests and updates ePower
-        if (x == "e" && (getNorthPort().getEPower() || getEastPort().getEPower() || getSouthPort().getEPower() || getWestPort().getEPower())){
-            portsList[0].setEPower(true);
-            portsList[1].setEPower(true);
-            portsList[2].setEPower(true);
-            portsList[3].setEPower(true);
+        if (x == "e" && (this.getNorthPort().getEPower() || this.getEastPort().getEPower() || this.getSouthPort().getEPower() || this.getWestPort().getEPower())){
+            this.portsList[0].setEPower(true);
+            this.portsList[1].setEPower(true);
+            this.portsList[2].setEPower(true);
+            this.portsList[3].setEPower(true);
             return true;
         }
         else if (x == "e") {
-            portsList[0].setEPower(false);
-            portsList[1].setEPower(false);
-            portsList[2].setEPower(false);
-            portsList[3].setEPower(false);
+            this.sportsList[0].setEPower(false);
+            this.sportsList[1].setEPower(false);
+            this.sportsList[2].setEPower(false);
+            this.sportsList[3].setEPower(false);
             return false
         }
         //only tests rPower
-        else if (x == "r" && (getNorthPort().getRPower() > 0 || getEastPort().getRPower() > 0 || getSouthPort().getRPower() > 0 || getWestPort().getRPower() > 0)){
+        else if (x == "r" && (this.getNorthPort().getRPower() > 0 || this.getEastPort().getRPower() > 0 || this.getSouthPort().getRPower() > 0 || this.getWestPort().getRPower() > 0)){
             return true;
         }
         else if (x == "r") {
@@ -184,7 +195,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         let max = 1;
         for (let i = 0; i < this.portsList.length; i++){
             if (this.portsList[i].getIo() == "input" && this.portsList[i].getRPower() > max){
-                max = portsList[i].getRPower();
+                max = this.portsList[i].getRPower();
             }
         }
         return max-1;
@@ -195,7 +206,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         let max = 1;
         for (let i = 0; i < this.portsList.length; i++){
             if (this.portsList[i].getIo() == "input" && this.portsList[i].getRPower() > max){
-                max = portsList[i].getRPower();
+                max = this.portsList[i].getRPower();
             }
         }
         return max;
@@ -215,76 +226,6 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
 
 
 //SECTION Update/Analysis
-//...
-//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
-//Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
-function testAbsurdity(option){
-    let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
-    let absurdText = JSON.stringify(blocksV1, null, 0);
-
-    /*
-    const characters: 
-    new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
-    
-    dynamic characters(ish): air | 1234 | 1 | off | images/air_1234_1_off.png | false | 
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-                        false | 0 | air | output | false
-    */
-    
-    //1 = character count of declaration
-    if (option = 1){
-        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
-        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
-        
-        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
-        
-        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
-        
-        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
-        
-        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
-
-        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
-    } 
-
-    //2 = one line JSON 
-    else if (option = 2) {
-        return absurdText;
-    } 
-
-    //3 = organized JSON
-    else if (option = 3) {
-        return organizedAbsurdText;
-    }
-}
-
-//tests and returns for available directions
-function edgeIdentifier(y,x){
-    let dirAvail = [1,2,3,4];
-    if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
-    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
-    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
-    if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
-    return dirAvail;
-}
-
-//tests ePower on surrounding blocks
-function ePowerTest(y,x){
-    let power = false;
-    let testBlocks = edgeIdentifier(y,x);
-
-    //sets ePower for all ports
-    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
-    if (testBlocks.includes(1) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y-1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(2) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x+1].powerTest("e")){power = true; }
-    else if (testBlocks.includes(3) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y+1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
-
-    return power;
-}
-
 //generic block creator (genEmpty = default/single-use)
 function genEmptyBlock(){
     return new Block(
@@ -434,8 +375,80 @@ function genBlock(block,y,x){
 }
 
 //blocksV1 for setting genBlocks & original data | blocksV2 for updating data and immediately copying it over
-var blocksV1 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
-var blocksV2 = Array.from({length:6}, () => Array.from({length:6}, genEmptyBlock()));
+var blocksV1;
+var blocksV2;
+blocksV1 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
+blocksV2 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
+
+//...
+//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
+//Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
+function testAbsurdity(option){
+    let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
+    let absurdText = JSON.stringify(blocksV1, null, 0);
+
+    /*
+    const characters: 
+    new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);
+    
+    dynamic characters(ish): air | 1234 | 1 | off | images/air_1234_1_off.png | false | 
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+                        false | 0 | air | output | false
+    */
+    
+    //1 = character count of declaration
+    if (option = 1){
+        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
+        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
+        
+        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
+        
+        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
+        
+        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
+        
+        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
+
+        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
+    } 
+
+    //2 = one line JSON 
+    else if (option = 2) {
+        return absurdText;
+    } 
+
+    //3 = organized JSON
+    else if (option = 3) {
+        return organizedAbsurdText;
+    }
+}
+
+//tests and returns for available directions
+function edgeIdentifier(y,x){
+    let dirAvail = [1,2,3,4];
+    if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
+    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
+    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
+    if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
+    return dirAvail;
+}
+
+//tests ePower on surrounding blocks
+function ePowerTest(y,x){
+    let power = false;
+    let testBlocks = edgeIdentifier(y,x);
+
+    //sets ePower for all ports
+    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
+    if (testBlocks.includes(1) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y-1][x].powerTest("e")){power = true; }
+    else if (testBlocks.includes(2) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x+1].powerTest("e")){power = true; }
+    else if (testBlocks.includes(3) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y+1][x].powerTest("e")){power = true; }
+    else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
+
+    return power;
+}
 
 //Updates the blocks list (and image list)
 function update(){
@@ -475,12 +488,48 @@ function update(){
             }
         }
     }
-
-    blocksV1 = structuredClone(blocksV2);
+    //console.log("initial type", blocksV1[0][0] instanceof Block)
+    //REVIEW convert structureclone to .clone()
+    blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
+    //console.log("after type", blocksV1[0][0] instanceof Block)
+    implement();
 }   
 
 //Implements the blocks list into the grid (HTML creation)
 function implement(){
+    console.log(blocksV1);
+    
+    //locksV1 exists
+    console.log("blocksV1 exists?", typeof blocksV1 !== 'undefined');
+    if (!blocksV1) return;
+    console.log("blocksV1 is array?", Array.isArray(blocksV1));
+    console.log("blocksV1 length:", blocksV1?.length);
+    
+    if (blocksV1[0]) {
+        console.log("blocksV1[0] is array?", Array.isArray(blocksV1[0]));
+        console.log("blocksV1[0] length:", blocksV1[0]?.length);
+        
+        const firstBlock = blocksV1[0][0];
+        console.log("blocksV1[0][0]:", firstBlock);
+        console.log("Type of blocksV1[0][0]:", typeof firstBlock);
+        console.log("Is Block instance?", firstBlock instanceof Block);
+        console.log("Constructor name:", firstBlock?.constructor?.name);
+        console.log("'getImg' in firstBlock?", 'getImg' in firstBlock);
+        console.log("firstBlock.getImg exists?", firstBlock?.getImg);
+        console.log("typeof firstBlock.getImg:", typeof firstBlock?.getImg);
+        
+        // Try to call it
+        if (firstBlock && typeof firstBlock.getImg === 'function') {
+            try {
+                console.log("Calling getImg():", firstBlock.getImg());
+            } catch (e) {
+                console.error("Error calling getImg():", e);
+            }
+        }
+    }
+
+
+
     //empties current div
     const grid = document.getElementById("placementGrid");
     const refDiv = document.createElement("div");
@@ -504,6 +553,11 @@ function implement(){
     }
 }
 
+//Block placement & selection
+function eventListener(){
+
+}
+
 //!SECTION
 
 
@@ -523,15 +577,16 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
            get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
            *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-Function Ref: testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x) genEmptyBlock() | genBlock(block,y,x)
+Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x)
 
-Implementation Ref: update() | implement()
+Implementation Ref: update() | implement() | eventListener()
 
 */
 
 function redstone_block_update(y,x){
     if (ePowerTest(y,x)){
-        blocksV2[y][x] = structuredClone(blocksV1[y][x]);
+        //REVIEW convert structureclone to .clone()
+        blocksV2[y][x] = blocksV1[y][x].clone();
     }
     blocksV2[y][x].setImg();
 }
@@ -645,74 +700,6 @@ function cobblestone_update(y,x){
     }
 }
 
-//!SECTION
-
-
-
-
-
-
-
-
-
-
-
-
-//SECTION Structure code
-// Set up event listeners
-function setupEventListeners() {
-    // Block selection
-    document.querySelectorAll('.block').forEach(block => {
-        block.addEventListener('click', function() {
-            // Remove selection from all blocks
-            document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
-            
-            // Select this block
-            this.classList.add('selected');
-            selectedBlock = this.dataset.blockId;
-            
-            console.log(`Selected block: ${getBlockName(selectedBlock)}`);
-        });
-    });
-
-    //grid cell placement
-    document.querySelectorAll('.grid-container').forEach(cell => {
-        cell.addEventListener('click', function() {
-            
-            const row = parseInt(this.dataset.row);
-            const col = parseInt(this.dataset.col);
-            
-            placeBlock(row, col, selectedBlock);
-        });
-    });
-
-    // Control buttons
-    document.getElementById('clearBtn').addEventListener('click', clearGrid);
-}
-// Clear the entire grid
-function clearGrid() {
-    // Reset the 2D array
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-            gridArray[row][col] = null;
-        }
-    }
-    
-    // Reset the visual grid
-    document.querySelectorAll('.grid-cell').forEach(cell => {
-        cell.style.backgroundColor = '';
-        cell.style.opacity = '';
-        cell.title = '';
-    });
-    
-    document.getElementById('arrayDisplay').innerHTML = '';
-    console.log('Grid cleared!');
-}
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', /*Initialize*/);
-
-//!SECTION
 
 
 /*DEPRECATED: stores all blocks as strings (with their attributes) - Don't need to anymore cause direct object conversion is possible

@@ -35,7 +35,7 @@
         - Result: A 6-column grid where blocks automatically wrap to new rows as needed.
         */
         display: grid;
-        grid-template-columns: repeat(6, 50px);
+        grid-template-columns: repeat(7, 50px);
         gap: 10px;
         justify-content: center;
         margin-bottom: 30px;
