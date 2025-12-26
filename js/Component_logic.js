@@ -298,6 +298,7 @@ function genEmptyBlock(){
         ]);
 }
 
+//NOTE Main block generator
 function genBlock(block,y,x){
     let dirTest = edgeIdentifier(y,x);
 
@@ -336,7 +337,6 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/redstone_dust_1234_1_off.png",
             [
-                //tentative i/o that will be determined on update-time
                 new Port(false, 0, surBlock[0], "none", true), 
                 new Port(false, 0, surBlock[1], "none", true), 
                 new Port(false, 0, surBlock[2], "none", true), 
@@ -370,11 +370,10 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/redstone_lamp_1234_1_off.png", 
             [
-                //tentative i/o that will be determined on update-time
-                new Port(false, 0, surBlock[0], "none", false), 
-                new Port(false, 0, surBlock[1], "none", false), 
-                new Port(false, 0, surBlock[2], "none", false), 
-                new Port(false, 0, surBlock[3], "none", false)
+                new Port(false, 0, surBlock[0], "input", false), 
+                new Port(false, 0, surBlock[1], "input", false), 
+                new Port(false, 0, surBlock[2], "input", false), 
+                new Port(false, 0, surBlock[3], "input", false)
             ]);
     }
     else if (block = "oak_button"){
@@ -393,11 +392,10 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/note_block_1234_1_off.png", 
             [
-                //tentative i/o that will be determined on update-time
-                new Port(false, 0, surBlock[0], "none", false), 
-                new Port(false, 0, surBlock[1], "none", false), 
-                new Port(false, 0, surBlock[2], "none", false), 
-                new Port(false, 0, surBlock[3], "none", false)
+                new Port(false, 0, surBlock[0], "input", false), 
+                new Port(false, 0, surBlock[1], "input", false), 
+                new Port(false, 0, surBlock[2], "input", false), 
+                new Port(false, 0, surBlock[3], "input", false)
             ]);
     }
     else if (block = "lever"){
@@ -427,11 +425,10 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/cobblestone_1234_1_off.png", 
             [
-                //tentative i/o that will be determined on update-time
-                new Port(true, 0, surBlock[0], "none", false), 
-                new Port(true, 0, surBlock[1], "none", false), 
-                new Port(true, 0, surBlock[2], "none", false), 
-                new Port(true, 0, surBlock[3], "none", false)
+                new Port(true, 0, surBlock[0], "input", false), 
+                new Port(true, 0, surBlock[1], "input", false), 
+                new Port(true, 0, surBlock[2], "input", false), 
+                new Port(true, 0, surBlock[3], "input", false)
             ]);
     }
 }
@@ -567,40 +564,27 @@ function redstone_dust_update(y,x){
             blockV1[y][x].setDirection(dirPrior.join(""));
         }
 
+        //update port i/o (deprecated because redstone is just "special"...)
+        //if (dirTest.includes(1) && blocksV2[y-1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getNorthPort().setIo((() => {if (blocksV2[y-1][x].getSouthPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes(2) && blocksV2[y][x+1].getBlockType() != "redstone_dust") blocksV2[y][x].getEastPort().setIo((() => {if (blocksV2[y][x+1].getWestPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes(3) && blocksV2[y+1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getSouthPort().setIo((() => {if (blocksV2[y+1][x].getNorthPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes(4) && blocksV2[y][x-1].getBlockType() != "redstone_dust") blocksV2[y][x].getWestPort().setIo((() => {if (blocksV2[y][x-1].getEastPort().getIo() == "input"){return output;} else {return "input";}})());
+        
+        //rPower establishment
+        if (blocksV1[y][x].getDirection().includes("1") && dirTest.includes(1) && blocksV2[y-1][x].getPort().getIo() == "output") blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().includes("2") && dirTest.includes(2) && blocksV2[y][x+1].getPort().getIo() == "output") blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().includes("3") && dirTest.includes(3) && blocksV2[y+1][x].getPort().getIo() == "output") blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().includes("4") && dirTest.includes(4) && blocksV2[y][x-1].getPort().getIo() == "output") blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().travellingPowerOutput());
+
         //on/off establishment
-        if (
-            (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getIo() == "output" && blocksV1[y-1][x].getSouthPort().getRPower() > 0) || 
-            (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getIo() == "output" && blocksV1[y][x+1].getWestPort().getRPower() > 0) ||
-            (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getIo() == "output" && blocksV1[y+1][x].getNorthPort().getRPower() > 0) ||
-            (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getIo() == "output" && blocksV1[y][x-1].getEastPort().getRPower() > 0)
-        ){
+        //REVIEW If this doesn't work, try this: (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getIo() == "output" && blocksV1[y-1][x].getSouthPort().getRPower() > 0) || (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getIo() == "output" && blocksV1[y][x+1].getWestPort().getRPower() > 0) || (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getIo() == "output" && blocksV1[y+1][x].getNorthPort().getRPower() > 0) || (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getIo() == "output" && blocksV1[y][x-1].getEastPort().getRPower() > 0)
+        if (blocksV1[y][x].powerTest("r")){
             blocksV2.setState("on");
         }
         else {
             blocksV2.setState("off");
         }
 
-        //rPower establishment
-        let max = 0;
-        
-
-        //update port i/o
-        if (dirTest.includes(1)) blocksV2[y][x].getNorthPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
-        if (dirTest.includes(2)) blocksV2[y][x].getEastPort().setIo(blocksV2[y][x].getEastPort().getIo() == "input" ? "output" : "input");
-        if (dirTest.includes(3)) blocksV2[y][x].getSouthPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
-        if (dirTest.includes(4)) blocksV2[y][x].getWestPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
-
-
-        /*
-        block, 1234, 1, "off", 
-            "images/redstone_dust_1234_1_off.png", 
-            [
-                new Port(false, 0, surBlock[0], "input", true), 
-                new Port(false, 0, surBlock[1], "input", true), 
-                new Port(false, 0, surBlock[2], "input", true), 
-                new Port(false, 0, surBlock[3], "input", true)
-            ]);
-        */
         blocksV2[y][x].setImg();
     }
 }
