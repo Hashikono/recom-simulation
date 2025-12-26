@@ -325,21 +325,22 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/redstone_block_1234_1_off.png", 
             [
-                new Port(false, 16, surBlock[0], "output", false), 
-                new Port(false, 16, surBlock[1], "output", false), 
-                new Port(false, 16, surBlock[2], "output", false), 
-                new Port(false, 16, surBlock[3], "output", false)
+                new Port(false, 16, surBlock[0], "output", true), 
+                new Port(false, 16, surBlock[1], "output", true), 
+                new Port(false, 16, surBlock[2], "output", true), 
+                new Port(false, 16, surBlock[3], "output", true)
             ]);
     }
     else if (block = "redstone_dust"){
         return new Block(
             block, 1234, 1, "off", 
-            "images/redstone_dust_1234_1_off.png", 
+            "images/redstone_dust_1234_1_off.png",
             [
-                new Port(false, 0, surBlock[0], "input", true), 
-                new Port(false, 0, surBlock[1], "input", true), 
-                new Port(false, 0, surBlock[2], "input", true), 
-                new Port(false, 0, surBlock[3], "input", true)
+                //tentative i/o that will be determined on update-time
+                new Port(false, 0, surBlock[0], "none", true), 
+                new Port(false, 0, surBlock[1], "none", true), 
+                new Port(false, 0, surBlock[2], "none", true), 
+                new Port(false, 0, surBlock[3], "none", true)
             ]);
     }
     else if (block = "redstone_repeator"){
@@ -348,9 +349,9 @@ function genBlock(block,y,x){
             "images/redstone_repeator_31_1_off.png", 
             [
                 new Port(false, 0, surBlock[0], "output", true), 
-                new Port(false, 0, surBlock[1], "output", false), 
+                new Port(false, 0, surBlock[1], "none", false), 
                 new Port(false, 0, surBlock[2], "input", true), 
-                new Port(false, 0, surBlock[3], "output", false)
+                new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
     else if (block = "redstone_comparator"){
@@ -369,10 +370,11 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/redstone_lamp_1234_1_off.png", 
             [
-                new Port(false, 0, surBlock[0], "input", false), 
-                new Port(false, 0, surBlock[1], "input", false), 
-                new Port(false, 0, surBlock[2], "input", false), 
-                new Port(false, 0, surBlock[3], "input", false)
+                //tentative i/o that will be determined on update-time
+                new Port(false, 0, surBlock[0], "none", false), 
+                new Port(false, 0, surBlock[1], "none", false), 
+                new Port(false, 0, surBlock[2], "none", false), 
+                new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
     else if (block = "oak_button"){
@@ -391,10 +393,11 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/note_block_1234_1_off.png", 
             [
-                new Port(false, 0, surBlock[0], "input", false), 
-                new Port(false, 0, surBlock[1], "input", false), 
-                new Port(false, 0, surBlock[2], "input", false), 
-                new Port(false, 0, surBlock[3], "input", false)
+                //tentative i/o that will be determined on update-time
+                new Port(false, 0, surBlock[0], "none", false), 
+                new Port(false, 0, surBlock[1], "none", false), 
+                new Port(false, 0, surBlock[2], "none", false), 
+                new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
     else if (block = "lever"){
@@ -424,10 +427,11 @@ function genBlock(block,y,x){
             block, 1234, 1, "off", 
             "images/cobblestone_1234_1_off.png", 
             [
-                new Port(true, 0, surBlock[0], "input", false), 
-                new Port(true, 0, surBlock[1], "input", false), 
-                new Port(true, 0, surBlock[2], "input", false), 
-                new Port(true, 0, surBlock[3], "input", false)
+                //tentative i/o that will be determined on update-time
+                new Port(true, 0, surBlock[0], "none", false), 
+                new Port(true, 0, surBlock[1], "none", false), 
+                new Port(true, 0, surBlock[2], "none", false), 
+                new Port(true, 0, surBlock[3], "none", false)
             ]);
     }
 }
@@ -563,9 +567,6 @@ function redstone_dust_update(y,x){
             blockV1[y][x].setDirection(dirPrior.join(""));
         }
 
-        //update ports
-        //REVIEW tests which directions are available and check if they are input/output and set the ports acordingly...
-
         //on/off establishment
         if (
             (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getIo() == "output" && blocksV1[y-1][x].getSouthPort().getRPower() > 0) || 
@@ -579,8 +580,18 @@ function redstone_dust_update(y,x){
             blocksV2.setState("off");
         }
 
+        //rPower establishment
+        let max = 0;
+        
 
-        /* 
+        //update port i/o
+        if (dirTest.includes(1)) blocksV2[y][x].getNorthPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
+        if (dirTest.includes(2)) blocksV2[y][x].getEastPort().setIo(blocksV2[y][x].getEastPort().getIo() == "input" ? "output" : "input");
+        if (dirTest.includes(3)) blocksV2[y][x].getSouthPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
+        if (dirTest.includes(4)) blocksV2[y][x].getWestPort().setIo(blocksV2[y][x].getNorthPort().getIo() == "input" ? "output" : "input");
+
+
+        /*
         block, 1234, 1, "off", 
             "images/redstone_dust_1234_1_off.png", 
             [
