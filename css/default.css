@@ -3,17 +3,22 @@
         background-color: rgb(122, 157, 102);;
         color: rgb(46, 46, 46);
         text-align: center;
-        padding: 20px;
+        padding: 10px;
+        margin: 15px;
     }
     
     .container {
-        max-width: 600px;
+        max-width: 500px;
         margin: 0 auto;
     }
     
     h1 {
         color: rgb(46, 46, 46);
-        margin-bottom: 30px;
+        margin-bottom: 5px;
+    }
+
+    h3 {
+        margin-top: 5px;
     }
 
     img {
@@ -38,7 +43,7 @@
         grid-template-columns: repeat(7, 50px);
         gap: 10px;
         justify-content: center;
-        margin-bottom: 30px;
+        margin-bottom: 15px;
         padding: 20px;
         background-color: #2a2a2a;
         border-radius: 10px;
@@ -88,6 +93,9 @@
         - justify-content: center: Centers the grid horizontally
         - Result: A perfect 6x6 grid where each cell is exactly positioned by row and column.
         */
+        padding: 15px;
+        background-color: #2a2a2a;
+        border-radius: 10px;
         display: grid;
         grid-template-columns: repeat(6, 60px);
         grid-template-rows: repeat(6, 60px);
@@ -115,8 +123,8 @@
     }
     
     .grid-cell:hover {
-        background-color: #4a4a4a;
-        border-color: #777;
+        transform: scale(1.1);
+        border-color: #fff;
     }
     
     .controls {

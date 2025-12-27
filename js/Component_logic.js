@@ -488,54 +488,15 @@ function update(){
             }
         }
     }
-    //console.log("initial type", blocksV1[0][0] instanceof Block)
-    //REVIEW convert structureclone to .clone()
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
-    //console.log("after type", blocksV1[0][0] instanceof Block)
     implement();
 }   
 
 //Implements the blocks list into the grid (HTML creation)
 function implement(){
-    console.log(blocksV1);
-    
-    //locksV1 exists
-    console.log("blocksV1 exists?", typeof blocksV1 !== 'undefined');
-    if (!blocksV1) return;
-    console.log("blocksV1 is array?", Array.isArray(blocksV1));
-    console.log("blocksV1 length:", blocksV1?.length);
-    
-    if (blocksV1[0]) {
-        console.log("blocksV1[0] is array?", Array.isArray(blocksV1[0]));
-        console.log("blocksV1[0] length:", blocksV1[0]?.length);
-        
-        const firstBlock = blocksV1[0][0];
-        console.log("blocksV1[0][0]:", firstBlock);
-        console.log("Type of blocksV1[0][0]:", typeof firstBlock);
-        console.log("Is Block instance?", firstBlock instanceof Block);
-        console.log("Constructor name:", firstBlock?.constructor?.name);
-        console.log("'getImg' in firstBlock?", 'getImg' in firstBlock);
-        console.log("firstBlock.getImg exists?", firstBlock?.getImg);
-        console.log("typeof firstBlock.getImg:", typeof firstBlock?.getImg);
-        
-        // Try to call it
-        if (firstBlock && typeof firstBlock.getImg === 'function') {
-            try {
-                console.log("Calling getImg():", firstBlock.getImg());
-            } catch (e) {
-                console.error("Error calling getImg():", e);
-            }
-        }
-    }
-
-
-
     //empties current div
     const grid = document.getElementById("placementGrid");
-    const refDiv = document.createElement("div");
-    refDiv.className = "grid-container";
-    refDiv.id = "placementGrid";
-    grid.replaceWith(refDiv);
+    grid.innerHTML = '';
     //adds stuff to the div
     for (let r = 0; r < 6; r++){
         for (let c = 0; c < 6; c++){
@@ -543,7 +504,9 @@ function implement(){
             const cell = document.createElement("div");
             cell.className = "grid-cell";
             cell.id = `cell-${r}-${c}`;
-                //image
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+                //image creation
                 const image = document.createElement("img");
                 image.src = blocksV1[r][c].getImg();
                 image.alt = blocksV1[r][c].getImg();
@@ -555,8 +518,11 @@ function implement(){
 
 //Block placement & selection
 function eventListener(){
-
+    
 }
+
+//
+window.onload = (() => {update(); console.log("Content Initial load!")});
 
 //!SECTION
 
@@ -585,7 +551,6 @@ Implementation Ref: update() | implement() | eventListener()
 
 function redstone_block_update(y,x){
     if (ePowerTest(y,x)){
-        //REVIEW convert structureclone to .clone()
         blocksV2[y][x] = blocksV1[y][x].clone();
     }
     blocksV2[y][x].setImg();
