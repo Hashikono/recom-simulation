@@ -133,7 +133,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     setImg(){ //string
         //images/redstone_repeator_13_1_off.png
         this.setImgPower();
-        this.img = `images/${this.blockType}_${this.direction}_${this.state}_${this.imgPower}.png`;
+        this.img = `images/${this.blockType}_${this.direction.toString()}_${this.state.toString()}_${this.imgPower}.png`;
     }
 
     //get methods for port objects
@@ -549,6 +549,7 @@ function update(){
     
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
     implement();
+    console.log(blocksV1);
 }   
 
 //Implements the blocks list into the grid (HTML creation)
@@ -679,6 +680,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
  //(∞) update function
+ //REVIEW Very buggy
 var continuousUpdate = false;
 function wUpdate(){
     continuousUpdate = !continuousUpdate;
@@ -688,6 +690,7 @@ function wUpdate(){
     if (continuousUpdate){
         document.getElementById("wupdate").style.backgroundColor = "#6bf3a1";
         wupInt = setInterval(function() {
+            update();
             console.log("while update process...")
             document.getElementById("wupdate").addEventListener("mouseup", function(){
                 continuousUpdate = !continuousUpdate; 
@@ -754,40 +757,48 @@ function redstone_dust_update(y,x){
         if (dirTest.includes("2") && blocksV1[y][x+1].getWestPort().getPrior()) dirPrior.push("2");
         if (dirTest.includes("3") && blocksV1[y+1][x].getNorthPort().getPrior()) dirPrior.push("3");
         if (dirTest.includes("4") && blocksV1[y][x-1].getEastPort().getPrior()) dirPrior.push("4");
-        
-        //direction establishment
-        if (dirPrior.length == 0 || dirPrior.length == 4){
-            blocksV1[y][x].setDirection(1234);
-        }
-        else if (dirPrior.length == 1){
-            if (dirPrior[0] == 1 || dirPrior[0] == 3){
-                blocksV1[y][x].setDirection(13);
-            }
-            else if (dirPrior[0] == 2 || dirPrior[0] == 4){
-                blocksV1[y][x].setDirection(24);
-            }
-        }
-        else if (dirPrior.length == 2 || dirPrior.length == 3){
-            blocksV1[y][x].setDirection(parseInt(dirPrior.join("")));
-        }
 
-        //update port i/o (deprecated because redstone is just "special"...)
-        //if (dirTest.includes("1") && blocksV2[y-1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getNorthPort().setIo((() => {if (blocksV2[y-1][x].getSouthPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes("2") && blocksV2[y][x+1].getBlockType() != "redstone_dust") blocksV2[y][x].getEastPort().setIo((() => {if (blocksV2[y][x+1].getWestPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes("3") && blocksV2[y+1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getSouthPort().setIo((() => {if (blocksV2[y+1][x].getNorthPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes("4") && blocksV2[y][x-1].getBlockType() != "redstone_dust") blocksV2[y][x].getWestPort().setIo((() => {if (blocksV2[y][x-1].getEastPort().getIo() == "input"){return output;} else {return "input";}})());
-        
-        //rPower establishment
-        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && blocksV2[y-1][x].getSouthPort().getIo() == "output"){
+        //direction establishment
+        //0-directions / 4-directions
+        if (dirPrior.length == 0 || dirPrior.length == 4){
+            blocksV2[y][x].setDirection(1234);
+        }
+        //1-direction
+        else if (dirPrior.length == 1){
+            let dustExist = false;
+            //tests if its the only redstone dust around
+            if (dirTest.includes("1") && blocksV1[y-1][x].getBlockType() == "redstone_dust") dustExist = true;
+            if (dirTest.includes("2") && blocksV1[y][x+1].getBlockType() == "redstone_dust") dustExist = true;
+            if (dirTest.includes("3") && blocksV1[y+1][x].getBlockType() == "redstone_dust") dustExist = true;
+            if (dirTest.includes("4") && blocksV1[y][x-1].getBlockType() == "redstone_dust") dustExist = true;
+
+            if (dustExist == false && (dirPrior[0] == 1 || dirPrior[0] == 3)){
+                blocksV2[y][x].setDirection(13);
+            }
+            else if (dustExist == false && (dirPrior[0] == 2 || dirPrior[0] == 4)){
+                blocksV2[y][x].setDirection(24);
+            }
+            else {
+                blocksV2[y][x].setDirection(1234);
+            }
+        }
+        //2-directions
+        else if (dirPrior.length == 2 || dirPrior.length == 3){
+            blocksV2[y][x].setDirection(parseInt(dirPrior.join("")));
+        }
+        console.log("getdirection",blocksV1[y][x].getDirection());
+
+        //rPower establishment (1. tests redstone direction inclusion; 2. makes sure nothing breaks on edges; 3.tests if output or another redstone dust)
+        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
             blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().getRPower()-1);
         }
-        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && blocksV2[y][x+1].getWestPort().getIo() == "output"){
+        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
             blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().getRPower()-1);
         }
-        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && blocksV2[y+1][x].getNorthPort().getIo() == "output"){
+        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
             blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().getRPower()-1);
         }
-        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && blocksV2[y][x-1].getEastPort().getIo() == "output"){
+        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
             blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().getRPower()-1);
         }
 
