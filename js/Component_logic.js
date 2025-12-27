@@ -529,7 +529,7 @@ function update(){
         for (let c = 0; c < blocksV1[0].length; c++){
             updateSurrounding(r,c);
             if (blocksV1[r][c].getBlockType() =="air"){
-                continue;
+                air_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_block"){
                 redstone_block_update(r,c);
@@ -754,6 +754,9 @@ Implementation Ref: update() | implement() | reset() | testAbsurdity(option)
 
 */
 
+function air_update(y,x){
+    blocksV2[y][x] = blocksV1[y][x].clone();
+}
 
 function redstone_block_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
@@ -790,10 +793,10 @@ function redstone_dust_update(y,x){
             if (dirTest.includes("3") && blocksV1[y+1][x].getBlockType() == "redstone_dust") dustExist = true;
             if (dirTest.includes("4") && blocksV1[y][x-1].getBlockType() == "redstone_dust") dustExist = true;
 
-            if (dustExist == false && (dirPrior[0] == 1 || dirPrior[0] == 3)){
+            if (dustExist == true && (dirPrior[0] == 1 || dirPrior[0] == 3)){
                 blocksV2[y][x].setDirection(13);
             }
-            else if (dustExist == false && (dirPrior[0] == 2 || dirPrior[0] == 4)){
+            else if (dustExist == true && (dirPrior[0] == 2 || dirPrior[0] == 4)){
                 blocksV2[y][x].setDirection(24);
             }
             else {
