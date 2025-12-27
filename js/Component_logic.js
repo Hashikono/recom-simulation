@@ -548,16 +548,19 @@ document.addEventListener("DOMContentLoaded", function () {
     let opt = document.getElementById("blockPalette");
     let pla = document.getElementById("placementGrid");
 
+    function selectionRemoval(){
+        if(selectedOption) selectedOption.classList.remove("selected");
+        if(selectedBlock) selectedBlock.classList.remove("selected");
+        selectedOption = null;
+        selectedBlock = null;
+    }
     //selection manager - options palette
     opt.addEventListener("click", function(opt) {
-        console.log("OPTIONS palette event listener activated")
+        //console.log("OPTIONS palette event listener activated")
         //initial element test (if outside; removes all selected)
         const option = opt.target.closest(".options");
         if(!option) {
-            selectedOption.classList.remove("selected");
-            selectedBlock.classList.remove("selected");
-            selectedOption = null;
-            selectedBlock = null;
+            selectionRemoval();
             return;
         }
         
@@ -576,27 +579,21 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedOption = option;
 
         //match instance
-        //if(selectedBlock){
-        //    selectedOption.classList.remove("selected");
-        //    selectedBlock.classList.remove("selected");
-        //    selectedOption = null;
-        //    selectedBlock = null;
-        //    console.log("Ready for block reassignment");
-        //}
+        if(selectedBlock){
+            selectionRemoval();;
+            console.log("Ready for block reassignment");
+        }
 
-        console.log("Selected option", option.dataset.opt)
+        //console.log("Selected option", option.dataset.opt)
     });
 
     //selection manager - block grid
     pla.addEventListener("click", function(bloc) {
-        console.log("BLOCK grid event listener activated")
+        //console.log("BLOCK grid event listener activated")
         //initial element test (if outside; removes all selected)
         const block = bloc.target.closest(".grid-cell");
         if(!block) {
-            selectedOption.classList.remove("selected");
-            selectedBlock.classList.remove("selected");
-            selectedOption = null;
-            selectedBlock = null;
+            selectionRemoval();
             return;
         }
 
@@ -616,10 +613,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         //match instance
         if(selectedOption){
-            selectedOption.classList.remove("selected");
-            selectedBlock.classList.remove("selected");
-            selectedOption = null;
-            selectedBlock = null;
+            selectionRemoval();
             console.log("Ready for block reassignment");
         }
 
@@ -627,8 +621,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-//DEBUGGING
+/*DEBUGGING selection stuff...
 console.log("Event listener tests...");
 console.log("existence of block-palette element", document.getElementById("blockPalette"));
 console.log("existence of placement-grid element", document.getElementById("placementGrid"));
@@ -637,6 +630,7 @@ console.log("block element?", document.querySelectorAll(".grid-cell").length);
 
 document.getElementById("blockPalette").addEventListener("click", function (testing) {console.log("blockPalette was clicked", testing.target);});
 document.getElementById("placementGrid").addEventListener("click", function (testing) {console.log("placementGrid was clicked", testing.target);});
+*/
 
 //!SECTION
 
