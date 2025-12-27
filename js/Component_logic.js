@@ -133,7 +133,7 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     setImg(){ //string
         //images/redstone_repeator_13_1_off.png
         this.setImgPower();
-        img = `images/${this.blockType}_${this.direction}_${this.state}_${this.imgPower}.png`;
+        this.img = `images/${this.blockType}_${this.direction}_${this.state}_${this.imgPower}.png`;
     }
 
     //get methods for port objects
@@ -164,10 +164,10 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
             return true;
         }
         else if (x == "e") {
-            this.sportsList[0].setEPower(false);
-            this.sportsList[1].setEPower(false);
-            this.sportsList[2].setEPower(false);
-            this.sportsList[3].setEPower(false);
+            this.portsList[0].setEPower(false);
+            this.portsList[1].setEPower(false);
+            this.portsList[2].setEPower(false);
+            this.portsList[3].setEPower(false);
             return false
         }
         //only tests rPower
@@ -239,7 +239,7 @@ function genEmptyBlock(){
         ]);
 }
 
-//NOTE Main block generator
+//NOTE Main block generator and updater
 function genBlock(block,y,x){
     let dirTest = edgeIdentifier(y,x);
 
@@ -251,7 +251,7 @@ function genBlock(block,y,x){
     if(dirTest.includes(4)){surBlock[3] = blocksV1[y][x-1].getBlockType(); }
 
     //implementation
-    if (block = "air"){
+    if (block == "air"){
         return new Block(
             block, 1234, 1, "off", 
             "images/air_1234_1_off.png", 
@@ -262,7 +262,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
-    else if (block = "redstone_block"){
+    else if (block == "redstone_block"){
         return new Block(
             block, 1234, 1, "off", 
             "images/redstone_block_1234_1_off.png", 
@@ -273,7 +273,7 @@ function genBlock(block,y,x){
                 new Port(false, 16, surBlock[3], "output", true)
             ]);
     }
-    else if (block = "redstone_dust"){
+    else if (block == "redstone_dust"){
         return new Block(
             block, 1234, 1, "off", 
             "images/redstone_dust_1234_1_off.png",
@@ -284,7 +284,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "none", true)
             ]);
     }
-    else if (block = "redstone_repeator"){
+    else if (block == "redstone_repeator"){
         return new Block(
             block, 31, 1, "off", 
             "images/redstone_repeator_31_1_off.png", 
@@ -295,7 +295,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
-    else if (block = "redstone_comparator"){
+    else if (block == "redstone_comparator"){
         return new Block(
             block, 31, 1, "off", 
             "images/redstone_comparator_31_1_off.png", 
@@ -306,7 +306,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "input", true)
             ]);
     }
-    else if (block = "redstone_lamp"){
+    else if (block == "redstone_lamp"){
         return new Block(
             block, 1234, 1, "off", 
             "images/redstone_lamp_1234_1_off.png", 
@@ -317,7 +317,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "input", false)
             ]);
     }
-    else if (block = "oak_button"){
+    else if (block == "oak_button"){
         return new Block(
             block, 1234, 1, "off", 
             "images/oak_button_1234_1_off.png", 
@@ -328,7 +328,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "output", true)
             ]);
     }
-    else if (block = "note_block"){
+    else if (block == "note_block"){
         return new Block(
             block, 1234, 1, "off", 
             "images/note_block_1234_1_off.png", 
@@ -339,7 +339,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "input", false)
             ]);
     }
-    else if (block = "lever"){
+    else if (block == "lever"){
         return new Block(
             block, 1234, 1, "off", 
             "images/lever_1234_1_off.png", 
@@ -350,7 +350,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "output", true)
             ]);
     }
-    else if (block = "observer"){
+    else if (block == "observer"){
         return new Block(
             block, 31, 1, "off", 
             "images/observer_31_1_off.png", 
@@ -361,7 +361,7 @@ function genBlock(block,y,x){
                 new Port(false, 0, surBlock[3], "none", false)
             ]);
     }
-    else if (block = "cobblestone"){
+    else if (block == "cobblestone"){
         return new Block(
             block, 1234, 1, "off", 
             "images/cobblestone_1234_1_off.png", 
@@ -371,6 +371,40 @@ function genBlock(block,y,x){
                 new Port(true, 0, surBlock[2], "input", false), 
                 new Port(true, 0, surBlock[3], "input", false)
             ]);
+    }
+    //REVIEW Add direction changer
+    else if (block == "stick"){
+        if (blocksV1[y][x].getBlockType() == "redstone_repeator"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "redstone_comparator"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "observer"){
+
+        }
+        //NOTE remove later:
+        return new Block(block, 1234, 1, "off", "images/air_1234_1_off.png", [new Port(false, 0, surBlock[0], "none", false), new Port(false, 0, surBlock[1], "none", false), new Port(false, 0, surBlock[2], "none", false), new Port(false, 0, surBlock[3], "none", false)]);
+    }
+    //REVIEW Add interaction
+    else if (block == "book"){
+        if (blocksV1[y][x].getBlockType() == "redstone_repeator"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "redstone_comparator"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "oak_button"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "note_block"){
+
+        }
+        else if (blocksV1[y][x].getBlockType() == "lever"){
+
+        }
+        //NOTE remove later:
+        return new Block(block, 1234, 1, "off", "images/air_1234_1_off.png", [new Port(false, 0, surBlock[0], "none", false), new Port(false, 0, surBlock[1], "none", false), new Port(false, 0, surBlock[2], "none", false), new Port(false, 0, surBlock[3], "none", false)]);
     }
 }
 
@@ -413,7 +447,7 @@ function testAbsurdity(option){
     //1 = character count of declaration
     if (option = 1){
         const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
-        let dynCharBlock = blocksV1.getBlockName().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
+        let dynCharBlock = blocksV1.getBlockType().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
         
         let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
         
@@ -464,7 +498,8 @@ function ePowerTest(y,x){
 
 //Updates the blocks list (and image list)
 function update(){
-    console.log("Block update!")
+    console.log("Block update!");
+    console.log("1",blocksV1[0][0]);
     //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
@@ -473,39 +508,43 @@ function update(){
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_block"){
                 redstone_block_update(r,c);
+                console.log("detected REDSTONE BLOCK");
+                console.log("blocksV2 block",blocksV2[0][0]);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_dust"){
-                redstone_dust(r,c);
+                redstone_dust_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_repeator"){
-                redstone_repeator(r,c);
+                redstone_repeator_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_comparator"){
-                redstone_comparator(r,c);
+                redstone_comparator_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_lamp"){
-                redstone_lamp(r,c);
+                redstone_lamp_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="oak_button"){
-                oak_button(r,c);
+                oak_button_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="note_block"){
-                note_block(r,c);
+                note_block_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="lever"){
-                lever(r,c);
+                lever_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="observer"){
-                observer(r,c);
+                observer_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="cobblestone"){
-                cobblestone(r,c);
+                cobblestone_update(r,c);
             }
         }
     }
     
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
+    console.log("2",blocksV1[0][0]);
     implement();
+    //console.log("3",blocksV1[0][0]);
 }   
 
 //Implements the blocks list into the grid (HTML creation)
@@ -532,11 +571,6 @@ function implement(){
     }
 }
 
-//Block placement & selection
-function eventListener(){
-    
-}
-
 //!SECTION
 
 
@@ -555,6 +589,22 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedOption = null;
         selectedBlock = null;
     }
+
+    //block substitution
+    function blockSubstitution(){
+        //console.log("block substituted")
+        //console.log("selected option", selectedOption);
+        //console.log("selected block", selectedBlock);
+
+        const rows = parseInt(selectedBlock.dataset.row);
+        const cols = parseInt(selectedBlock.dataset.col);
+        const optData = selectedOption.dataset.opt;
+        blocksV1[rows][cols] = genBlock(optData, rows, cols);
+        //console.log("blocksV1 @ update place", blocksV1[rows][cols]);
+        //console.log("whats supposed to happen",genBlock(optData, rows, cols));
+        update();
+    }
+
     //selection manager - options palette
     opt.addEventListener("click", function(opt) {
         //console.log("OPTIONS palette event listener activated")
@@ -572,17 +622,15 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         
-        //resets selection    
+        //resets &reassigns selection    
         if (selectedOption) selectedOption.classList.remove("selected");
-
-        //reassigns option
         option.classList.add("selected");
         selectedOption = option;
 
-        //match instance
+        //NOTE match instance
         if(selectedBlock){
-            selectionRemoval();;
-            console.log("Ready for block reassignment");
+            blockSubstitution();
+            selectionRemoval();
         }
 
         //console.log("Selected option", option.dataset.opt)
@@ -605,17 +653,15 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        //resets selection    
+        //resets & reassigns selection    
         if (selectedBlock) selectedBlock.classList.remove("selected");
-
-        //reassigns block
         block.classList.add("selected");
         selectedBlock = block;
 
-        //match instance
+        //NOTE match instance
         if(selectedOption){
+            blockSubstitution();
             selectionRemoval();
-            console.log("Ready for block reassignment");
         }
 
         //console.log("Selected block", block.dataset.row, block.dataset.col)
@@ -664,14 +710,13 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
 
 Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x)
 
-Implementation Ref: update() | implement() | eventListener() | reset()
+Implementation Ref: update() | implement() | reset()
 
 */
 
 function redstone_block_update(y,x){
-    if (ePowerTest(y,x)){
-        blocksV2[y][x] = blocksV1[y][x].clone();
-    }
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    console.log("time when blocksV2 was changed",blocksV2[y][x]);
     blocksV2[y][x].setImg();
 }
 
