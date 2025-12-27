@@ -27,18 +27,8 @@
         object-fit: cover; /* or contain, fill, etc. */
     }
 
+    /*//SECTION block options*/
     .block-palette {
-        /*
-        - display: grid: Turns this container into a CSS Grid container
-        - grid-template-columns: repeat(6, 50px): Creates 6 equal columns, each 50px wide
-        - repeat(6, 50px) means "create 6 columns, each 50px wide"
-        - gap: 10px: Adds 10px spacing between each grid cell
-        - justify-content: center: Centers the entire grid horizontally within its container
-        - margin-bottom: 30px: Adds space below the palette before the building grid
-        - background-color: #2a2a2a: Slightly lighter dark background for contrast
-        - border-radius: 10px: Rounded corners for modern look
-        - Result: A 6-column grid where blocks automatically wrap to new rows as needed.
-        */
         display: grid;
         grid-template-columns: repeat(7, 50px);
         gap: 10px;
@@ -49,14 +39,7 @@
         border-radius: 10px;
     }
     
-    .block {
-        /*
-        - width/height: 50px: Makes each block square, matching the grid column width
-        - border: 2px solid transparent: Invisible border that becomes visible when selected
-        - border-radius: 5px: Slightly rounded block corners
-        - cursor: pointer: Changes mouse to hand cursor on hover
-        - transition: all 0.2s ease: Smooth animations for hover/selection effects
-        */
+    .options {
         width: 50px;
         height: 50px;
         border: 2px solid transparent;
@@ -65,42 +48,22 @@
         transition: all 0.2s ease;
     }
     
-    .block:hover {
+    .options:hover {
         transform: scale(1.1);
         border-color: #fff;
     }
     
-    .block.selected {
-        /*
-        - border-color: #55ff55: Green border for selected state (Minecraft green)
-        - border-width: 3px: Thicker border for emphasis
-        - transform: scale(1.1): Keeps the enlarged size
-        - box-shadow: 0 0 10px #55ff55: Green glow effect around selected block
-        */
+    .options.selected {
         border-color: #ffffff;
         border-width: 3px;
         transform: scale(1.1);
         box-shadow: 0 0 10px #ffffff;
     }
-
-    .grid-cell.selected {
-        border-color: #ffffff;
-        border-width: 3px;
-        transform: scale(1.1);
-        box-shadow: 0 0 10px #ffffff;
-        z-index: 1;
-        position: relative;
-    }
+    /*//!SECTION */
     
-    .grid-container {
-        /*
-        - This creates the main 6x6 building grid:
-        - display: grid: CSS Grid container
-        - grid-template-columns: repeat(6, 60px): 6 columns, each 60px wide
-        - grid-template-rows: repeat(6, 60px): 6 rows, each 60px tall
-        - gap: 5px: 5px spacing between grid cells
-        - justify-content: center: Centers the grid horizontally
-        */
+
+    /*//SECTION block grid*/
+    .placement-grid {
         padding: 15px;
         background-color: #3f3f3f;
         border-radius: 10px;
@@ -113,14 +76,6 @@
     }
     
     .grid-cell {
-        /*
-        - width/height: 60px: Matches the grid template dimensions
-        - background-color: #3a3a3a: Default empty cell color
-        - border: 2px solid #555: Visible grid lines between cells
-        - border-radius: 3px: Slight rounding for modern look
-        - cursor: pointer: Clickable indication
-        - transition: Smooth color changes
-        */
         width: 60px;
         height: 60px;
         background-color: #3a3a3a;
@@ -134,11 +89,17 @@
         transform: scale(1.1);
         border-color: #fff;
     }
-    
-    .controls {
-        
-        margin: 20px 0;
+
+    .grid-cell.selected {
+        border-color: #ffffff;
+        border-width: 3px;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #ffffff;
+        z-index: 1;
+        position: relative;
     }
+    /*//!SECTION */
+
     
     button {
         background-color: rgb(188, 188, 188);
@@ -154,21 +115,4 @@
     
     button:hover {
         background-color: #848484;
-    }
-    
-    .array-display {
-        /*
-        - font-family: 'Courier New': Monospace font for code display
-        - text-align: left: Aligns code to the left for readability
-        - max-height: 200px: Limits height with scrollbar for long content
-        - overflow-y: auto: Adds scrollbar when content overflows
-        */
-        background-color: #2a2a2a;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 20px;
-        font-family: 'Courier New', monospace;
-        text-align: left;
-        max-height: 200px;
-        overflow-y: auto;
     }

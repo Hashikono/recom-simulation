@@ -468,8 +468,10 @@ function update(){
     //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
-            //temp variables to update item @ [r][c] (index 0 = obj, index 1 = img)
-            if (blocksV1[r][c].getBlockType() =="redstone_block"){
+            if (blocksV1[r][c].getBlockType() =="air"){
+                continue;
+            } 
+            else if (blocksV1[r][c].getBlockType() =="redstone_block"){
                 redstone_block_update(r,c);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_dust"){
@@ -539,27 +541,98 @@ function eventListener(){
 
 
 //SECTION Onsite processes
-//selection manager - palette
-document.getElementById("blockPalette").addEventListener("click", (comp) => {
-    //initial element test
-    const block = comp.target.closest(".block");
-    if(!block) return;
-    
-    //resets selection    
-    if (selectedOption) selectedBlock.classList.remove("selected");
-    if (selectedBlock) selectedBlock.classList.remove("selected");
-
-    //reassign block
-    block.classList.add("selected");
-    selectedOption = null;
-    selectedBlock = block;
-});
-
-//selection manager - grid
-
-
 //Initial loading of content
 window.onload = (() => {update(); console.log("Content Initial load!")});
+
+//DEBUGGING
+console.log("Event listener tests...");
+console.log("existence of block-palette element", document.getElementById("blockPalette"));
+console.log("existence of placement-grid element", document.getElementById("placementGrid"));
+console.log("options element?", document.querySelectorAll(".options").length);
+console.log("block element?", document.querySelectorAll(".grid-cell").length);
+
+document.getElementById("blockPalette").addEventListener("click", function (testing) {console.log("blockPalette was clicked", testing.target);});
+document.getElementById("placementGrid").addEventListener("click", function (testing) {console.log("placementGrid was clicked", testing.target);});
+
+
+//selection manager - options palette
+document.getElementById("blockPalette").addEventListener("click", (opt) => {
+    console.log("OPTIONS palette event listener activated")
+    //initial element test (if outside; removes all selected)
+    const option = opt.target.closest(".options");
+    if(!option) {
+        selectedOption.classList.remove("selected");
+        selectedBlock.classList.remove("selected");
+        selectedOption = null;
+        selectedBlock = null;
+        return;
+    }
+    
+    //element toggle (if you click the same element twice)
+    if (selectedOption == option) {
+        option.classList.remove("selected");
+        selectedOption = null;
+        return;
+    }
+    
+    //resets selection    
+    if (selectedOption) selectedOption.classList.remove("selected");
+
+    //reassigns option
+    option.classList.add("selected");
+    selectedOption = option;
+
+    //match instance
+    //if(selectedBlock){
+    //    selectedOption.classList.remove("selected");
+    //    selectedBlock.classList.remove("selected");
+    //    selectedOption = null;
+    //    selectedBlock = null;
+    //    console.log("Ready for block reassignment");
+    //}
+
+    console.log("Selected option", option.dataset.opt)
+});
+
+
+//selection manager - block grid
+document.getElementById("placementGrid").addEventListener("click", (bloc) => {
+    console.log("BLOCK grid event listener activated")
+    //initial element test (if outside; removes all selected)
+    const block = bloc.target.closest(".grid-cell");
+    if(!block) {
+        selectedOption.classList.remove("selected");
+        selectedBlock.classList.remove("selected");
+        selectedOption = null;
+        selectedBlock = null;
+        return;
+    }
+
+    //element toggle (if you click the same element twice)
+    if (selectedBlock == block) {
+        block.classList.remove("selected");
+        selectedBlock = null;
+        return;
+    }
+
+    //resets selection    
+    if (selectedBlock) selectedBlock.classList.remove("selected");
+
+    //reassigns block
+    block.classList.add("selected");
+    selectedBlock = block;
+
+    //match instance
+    //if(selectedOption){
+    //    selectedOption.classList.remove("selected");
+    //    selectedBlock.classList.remove("selected");
+    //    selectedOption = null;
+    //    selectedBlock = null;
+    //    console.log("Ready for block reassignment");
+    //}
+
+    //console.log("Selected block", block.dataset.row, block.dataset.col)
+});
 
 //!SECTION
 
