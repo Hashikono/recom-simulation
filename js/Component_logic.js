@@ -472,6 +472,22 @@ function testAbsurdity(option){
     }
 }
 
+//updates surrounding blocks in blocksV2
+function updateSurrounding(y,x){
+    let dirTesting =edgeIdentifier(y,x);
+    //constructing surrounding blocks list
+    let surBlock = ["air","air","air","air"];
+    if(dirTesting.includes(1)){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
+    if(dirTesting.includes(2)){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
+    if(dirTesting.includes(3)){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
+    if(dirTesting.includes(4)){surBlock[3] = blocksV1[y][x-1].getBlockType(); } 
+
+    blocksV2[y][x].getNorthPort().setConBlockType(surBlock[0]);
+    blocksV2[y][x].getEastPort().setConBlockType(surBlock[1]);
+    blocksV2[y][x].getSouthPort().setConBlockType(surBlock[2]);
+    blocksV2[y][x].getWestPort().setConBlockType(surBlock[3]);
+}
+
 //tests and returns for available directions
 function edgeIdentifier(y,x){
     let dirAvail = ["1","2","3","4"];
@@ -511,6 +527,7 @@ function update(){
     //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
+            updateSurrounding(r,c);
             if (blocksV1[r][c].getBlockType() =="air"){
                 continue;
             } 
@@ -544,6 +561,7 @@ function update(){
             else if (blocksV1[r][c].getBlockType() =="cobblestone"){
                 cobblestone_update(r,c);
             }
+            blocksV2[r][c].setImg();
         }
     }
     
@@ -730,17 +748,17 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
            get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
            *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval()
+Function Ref: genEmptyBlock() | genBlock(block,y,x) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval() | updateSurrounding(y,x)
 
-Implementation Ref: update() | implement() | reset()
+Implementation Ref: update() | implement() | reset() | testAbsurdity(option)
 
 */
+
 
 function redstone_block_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -788,19 +806,29 @@ function redstone_dust_update(y,x){
         }
         console.log("getdirection",blocksV1[y][x].getDirection());
 
-        //rPower establishment (1. tests redstone direction inclusion; 2. makes sure nothing breaks on edges; 3.tests if output or another redstone dust)
-        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
-            blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().getRPower()-1);
+        //REVIEW Get the lone redstone dust direction thing to work
+
+        let rPowe = 0;
+        //REVIEW Do max algorithm to find maximum output
+        //rPower establishment
+        if (dirTest.includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
+            rPowe = blocksV2[y-1][x].getSouthPort().getRPower()-1;
         }
-        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
-            blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().getRPower()-1);
+        if (dirTest.includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
+            rPowe = blocksV2[y][x+1].getWestPort().getRPower()-1;
         }
-        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
-            blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().getRPower()-1);
+        if (dirTest.includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
+            rPowe = blocksV2[y+1][x].getNorthPort().getRPower()-1;
         }
-        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
-            blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().getRPower()-1);
+        if (dirTest.includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
+            rPowe = blocksV2[y][x-1].getEastPort().getRPower()-1;
         }
+        
+        //maximum power output
+        if (blocksV1[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowe); 
+        if (blocksV1[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowe);
+        if (blocksV1[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowe);
+        if (blocksV1[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowe);
 
         //on/off establishment
         if (blocksV1[y][x].powerTest("r")){
@@ -809,8 +837,6 @@ function redstone_dust_update(y,x){
         else {
             blocksV2[y][x].setImgPower("off");
         }
-
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -818,7 +844,6 @@ function redstone_repeator_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -826,7 +851,6 @@ function redstone_comparator_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -834,7 +858,6 @@ function redstone_lamp_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -842,7 +865,6 @@ function oak_button_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -850,7 +872,6 @@ function note_block_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -858,7 +879,6 @@ function lever_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -866,7 +886,6 @@ function observer_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
@@ -874,7 +893,6 @@ function cobblestone_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
         blocksV2[y][x] = blocksV1[y][x].clone();
-        blocksV2[y][x].setImg();
     }
 }
 
