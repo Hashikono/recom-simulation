@@ -492,8 +492,8 @@ function updateSurrounding(y,x){
 function edgeIdentifier(y,x){
     let dirAvail = ["1","2","3","4"];
     if (y-1 < 0) dirAvail.splice(dirAvail.indexOf("1"),1);
-    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf("2"),1);
-    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf("3"),1);
+    if (x+1 > 5) dirAvail.splice(dirAvail.indexOf("2"),1);
+    if (y+1 > 5) dirAvail.splice(dirAvail.indexOf("3"),1);
     if (x-1 < 0) dirAvail.splice(dirAvail.indexOf("4"),1);
     return dirAvail;
 }
@@ -810,18 +810,20 @@ function redstone_dust_update(y,x){
 
         let rPowe = 0;
         //REVIEW Do max algorithm to find maximum output
+
         //rPower establishment
-        if (dirTest.includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
-            rPowe = blocksV2[y-1][x].getSouthPort().getRPower()-1;
+        //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
+        if (dirTest.includes("1") && blocksV1[y][x].getDirection().toString().includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
+            if (blocksV2[y-1][x].getSouthPort().getRPower()-1 > rPowe) rPowe = blocksV2[y-1][x].getSouthPort().getRPower()-1;
         }
-        if (dirTest.includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
-            rPowe = blocksV2[y][x+1].getWestPort().getRPower()-1;
+        if (dirTest.includes("2") && blocksV1[y][x].getDirection().toString().includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
+            if (blocksV2[y][x+1].getWestPort().getRPower()-1 > rPowe) rPowe = blocksV2[y][x+1].getWestPort().getRPower()-1;
         }
-        if (dirTest.includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
-            rPowe = blocksV2[y+1][x].getNorthPort().getRPower()-1;
+        if (dirTest.includes("3") && blocksV1[y][x].getDirection().toString().includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
+            if (blocksV2[y+1][x].getNorthPort().getRPower()-1 > rPowe) rPowe = blocksV2[y+1][x].getNorthPort().getRPower()-1;
         }
-        if (dirTest.includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
-            rPowe = blocksV2[y][x-1].getEastPort().getRPower()-1;
+        if (dirTest.includes("4") && blocksV1[y][x].getDirection().toString().includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
+            if (blocksV2[y][x-1].getEastPort().getRPower()-1 > rPowe) rPowe = blocksV2[y][x-1].getEastPort().getRPower()-1;
         }
         
         //maximum power output
