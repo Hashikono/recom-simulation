@@ -423,6 +423,7 @@ function reset(){
     console.log("Block reset!");
     blocksV1 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
     blocksV2 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
+    selectionRemoval();
     update();
 }
 
@@ -473,11 +474,11 @@ function testAbsurdity(option){
 
 //tests and returns for available directions
 function edgeIdentifier(y,x){
-    let dirAvail = [1,2,3,4];
-    if (y-1 < 0) dirAvail.splice(dirAvail.indexOf(1),1);
-    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf(2),1);
-    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf(3),1);
-    if (x-1 < 0) dirAvail.splice(dirAvail.indexOf(4),1);
+    let dirAvail = ["1","2","3","4"];
+    if (y-1 < 0) dirAvail.splice(dirAvail.indexOf("1"),1);
+    if (x+1 > 6) dirAvail.splice(dirAvail.indexOf("2"),1);
+    if (y+1 > 6) dirAvail.splice(dirAvail.indexOf("3"),1);
+    if (x-1 < 0) dirAvail.splice(dirAvail.indexOf("4"),1);
     return dirAvail;
 }
 
@@ -494,6 +495,14 @@ function ePowerTest(y,x){
     else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
 
     return power;
+}
+
+//removes selection
+function selectionRemoval(){
+    //if(selectedOption) selectedOption.classList.remove("selected");
+    if(selectedBlock) selectedBlock.classList.remove("selected");
+    //selectedOption = null;
+    selectedBlock = null;
 }
 
 //Updates the blocks list (and image list)
@@ -579,14 +588,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let opt = document.getElementById("blockPalette");
     //PLAcement grid element 
     let pla = document.getElementById("placementGrid");
-    
-    //removes selection
-    function selectionRemoval(){
-        if(selectedOption) selectedOption.classList.remove("selected");
-        if(selectedBlock) selectedBlock.classList.remove("selected");
-        selectedOption = null;
-        selectedBlock = null;
-    }
 
     //block substitution
     function blockSubstitution(){
@@ -704,7 +705,7 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
            get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
            *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x)
+Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval()
 
 Implementation Ref: update() | implement() | reset()
 
@@ -721,15 +722,16 @@ function redstone_block_update(y,x){
 function redstone_dust_update(y,x){
     //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
     if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         //direction availability - initial cleaning of edge "blocks"
         let dirTest = edgeIdentifier(y,x);
 
         //direction priority - testing priority in surrounding blocks
         let dirPrior = [];
-        if (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getPrior()) dirPrior.push(1);
-        if (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getPrior()) dirPrior.push(2);
-        if (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getPrior()) dirPrior.push(3);
-        if (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getPrior()) dirPrior.push(4);
+        if (dirTest.includes("1") && blocksV1[y-1][x].getSouthPort().getPrior()) dirPrior.push("1");
+        if (dirTest.includes("2") && blocksV1[y][x+1].getWestPort().getPrior()) dirPrior.push("2");
+        if (dirTest.includes("3") && blocksV1[y+1][x].getNorthPort().getPrior()) dirPrior.push("3");
+        if (dirTest.includes("4") && blocksV1[y][x-1].getEastPort().getPrior()) dirPrior.push("4");
         
         //direction establishment
         if (dirPrior.length == 0 || dirPrior.length == 4){
@@ -737,35 +739,34 @@ function redstone_dust_update(y,x){
         }
         else if (dirPrior.length == 1){
             if (dirPrior[0] == 1 || dirPrior[0] == 3){
-                blockV1[y][x].setDirection(13);
+                blocksV1[y][x].setDirection(13);
             }
             else if (dirPrior[0] == 2 || dirPrior[0] == 4){
-                blockV1[y][x].setDirection(24);
+                blocksV1[y][x].setDirection(24);
             }
         }
         else if (dirPrior.length == 2 || dirPrior.length == 3){
-            blockV1[y][x].setDirection(dirPrior.join(""));
+            blocksV1[y][x].setDirection(parseInt(dirPrior.join("")));
         }
 
         //update port i/o (deprecated because redstone is just "special"...)
-        //if (dirTest.includes(1) && blocksV2[y-1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getNorthPort().setIo((() => {if (blocksV2[y-1][x].getSouthPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes(2) && blocksV2[y][x+1].getBlockType() != "redstone_dust") blocksV2[y][x].getEastPort().setIo((() => {if (blocksV2[y][x+1].getWestPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes(3) && blocksV2[y+1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getSouthPort().setIo((() => {if (blocksV2[y+1][x].getNorthPort().getIo() == "input"){return output;} else {return "input";}})());
-        //if (dirTest.includes(4) && blocksV2[y][x-1].getBlockType() != "redstone_dust") blocksV2[y][x].getWestPort().setIo((() => {if (blocksV2[y][x-1].getEastPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes("1") && blocksV2[y-1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getNorthPort().setIo((() => {if (blocksV2[y-1][x].getSouthPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes("2") && blocksV2[y][x+1].getBlockType() != "redstone_dust") blocksV2[y][x].getEastPort().setIo((() => {if (blocksV2[y][x+1].getWestPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes("3") && blocksV2[y+1][x].getBlockType() != "redstone_dust") blocksV2[y][x].getSouthPort().setIo((() => {if (blocksV2[y+1][x].getNorthPort().getIo() == "input"){return output;} else {return "input";}})());
+        //if (dirTest.includes("4") && blocksV2[y][x-1].getBlockType() != "redstone_dust") blocksV2[y][x].getWestPort().setIo((() => {if (blocksV2[y][x-1].getEastPort().getIo() == "input"){return output;} else {return "input";}})());
         
         //rPower establishment
-        if (blocksV1[y][x].getDirection().includes("1") && dirTest.includes(1) && blocksV2[y-1][x].getPort().getIo() == "output") blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().includes("2") && dirTest.includes(2) && blocksV2[y][x+1].getPort().getIo() == "output") blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().includes("3") && dirTest.includes(3) && blocksV2[y+1][x].getPort().getIo() == "output") blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().includes("4") && dirTest.includes(4) && blocksV2[y][x-1].getPort().getIo() == "output") blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && blocksV2[y-1][x].getSouthPort().getIo() == "output") blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && blocksV2[y][x+1].getWestPort().getIo() == "output") blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && blocksV2[y+1][x].getNorthPort().getIo() == "output") blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && blocksV2[y][x-1].getEastPort().getIo() == "output") blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().travellingPowerOutput());
 
         //on/off establishment
-        //REVIEW If this doesn't work, try this: (dirTest.includes(1) && blocksV1[y-1][x].getSouthPort().getIo() == "output" && blocksV1[y-1][x].getSouthPort().getRPower() > 0) || (dirTest.includes(2) && blocksV1[y][x+1].getWestPort().getIo() == "output" && blocksV1[y][x+1].getWestPort().getRPower() > 0) || (dirTest.includes(3) && blocksV1[y+1][x].getNorthPort().getIo() == "output" && blocksV1[y+1][x].getNorthPort().getRPower() > 0) || (dirTest.includes(4) && blocksV1[y][x-1].getEastPort().getIo() == "output" && blocksV1[y][x-1].getEastPort().getRPower() > 0)
         if (blocksV1[y][x].powerTest("r")){
-            blocksV2.setState("on");
+            blocksV2[y][x].setImgPower("on");
         }
         else {
-            blocksV2.setState("off");
+            blocksV2[y][x].setImgPower("off");
         }
 
         blocksV2[y][x].setImg();
@@ -773,57 +774,65 @@ function redstone_dust_update(y,x){
 }
 
 function redstone_repeator_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function redstone_comparator_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function redstone_lamp_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function oak_button_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function note_block_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function lever_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function observer_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
 
 function cobblestone_update(y,x){
-    if (ePowerTest(y,x)){
-        //
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
         blocksV2[y][x].setImg();
     }
 }
