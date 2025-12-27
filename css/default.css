@@ -77,10 +77,19 @@
         - transform: scale(1.1): Keeps the enlarged size
         - box-shadow: 0 0 10px #55ff55: Green glow effect around selected block
         */
-        border-color: #55ff55;
+        border-color: #ffffff;
         border-width: 3px;
         transform: scale(1.1);
-        box-shadow: 0 0 10px #55ff55;
+        box-shadow: 0 0 10px #ffffff;
+    }
+
+    .grid-cell.selected {
+        border-color: #ffffff;
+        border-width: 3px;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #ffffff;
+        z-index: 1;
+        position: relative;
     }
     
     .grid-container {
@@ -91,10 +100,9 @@
         - grid-template-rows: repeat(6, 60px): 6 rows, each 60px tall
         - gap: 5px: 5px spacing between grid cells
         - justify-content: center: Centers the grid horizontally
-        - Result: A perfect 6x6 grid where each cell is exactly positioned by row and column.
         */
         padding: 15px;
-        background-color: #2a2a2a;
+        background-color: #3f3f3f;
         border-radius: 10px;
         display: grid;
         grid-template-columns: repeat(6, 60px);

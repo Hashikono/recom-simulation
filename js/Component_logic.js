@@ -380,6 +380,18 @@ var blocksV2;
 blocksV1 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
 blocksV2 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
 
+//selection variables
+var selectedOption = null;
+var selectedBlock = null;
+
+//clear button
+function reset(){
+    console.log("Block reset!");
+    blocksV1 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
+    blocksV2 = Array.from({length:6}, () => Array.from({length:6}, () => genEmptyBlock()));
+    update();
+}
+
 //...
 //this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
 //Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
@@ -452,7 +464,8 @@ function ePowerTest(y,x){
 
 //Updates the blocks list (and image list)
 function update(){
-    //main updater
+    console.log("Block update!")
+    //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
             //temp variables to update item @ [r][c] (index 0 = obj, index 1 = img)
@@ -488,6 +501,7 @@ function update(){
             }
         }
     }
+    
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
     implement();
 }   
@@ -521,7 +535,30 @@ function eventListener(){
     
 }
 
-//
+//!SECTION
+
+
+//SECTION Onsite processes
+//selection manager - palette
+document.getElementById("blockPalette").addEventListener("click", (comp) => {
+    //initial element test
+    const block = comp.target.closest(".block");
+    if(!block) return;
+    
+    //resets selection    
+    if (selectedOption) selectedBlock.classList.remove("selected");
+    if (selectedBlock) selectedBlock.classList.remove("selected");
+
+    //reassign block
+    block.classList.add("selected");
+    selectedOption = null;
+    selectedBlock = block;
+});
+
+//selection manager - grid
+
+
+//Initial loading of content
 window.onload = (() => {update(); console.log("Content Initial load!")});
 
 //!SECTION
@@ -534,7 +571,6 @@ window.onload = (() => {update(); console.log("Content Initial load!")});
 > image if necessary (on/off)
 
 
-
 Port Ref:  new Port(ePow(bool), rPow(int), conBlockType(str), io(str), priority(bool))
            s/getEPower(bool) | s/getRPower(int) | s/getConBlockType(str) | s/getIo(str) | s/getPrior(bool)
 
@@ -545,7 +581,7 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
 
 Function Ref: genEmptyBlock() | genBlock(block,y,x) | testAbsurdity(option) | edgeIdentifier(y,x) | ePowertest(y,x)
 
-Implementation Ref: update() | implement() | eventListener()
+Implementation Ref: update() | implement() | eventListener() | reset()
 
 */
 
