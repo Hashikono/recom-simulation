@@ -499,7 +499,6 @@ function ePowerTest(y,x){
 //Updates the blocks list (and image list)
 function update(){
     console.log("Block update!");
-    console.log("1",blocksV1[0][0]);
     //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
@@ -508,8 +507,6 @@ function update(){
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_block"){
                 redstone_block_update(r,c);
-                console.log("detected REDSTONE BLOCK");
-                console.log("blocksV2 block",blocksV2[0][0]);
             } 
             else if (blocksV1[r][c].getBlockType() =="redstone_dust"){
                 redstone_dust_update(r,c);
@@ -542,9 +539,7 @@ function update(){
     }
     
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
-    console.log("2",blocksV1[0][0]);
     implement();
-    //console.log("3",blocksV1[0][0]);
 }   
 
 //Implements the blocks list into the grid (HTML creation)
@@ -578,8 +573,11 @@ function implement(){
 //Initial loading of content
 window.onload = (() => {update(); console.log("Content Initial load!")});
 
+//main activity detection and updating
 document.addEventListener("DOMContentLoaded", function () {
+    //OPTion grid element
     let opt = document.getElementById("blockPalette");
+    //PLAcement grid element 
     let pla = document.getElementById("placementGrid");
     
     //removes selection
@@ -595,7 +593,6 @@ document.addEventListener("DOMContentLoaded", function () {
         //console.log("block substituted")
         //console.log("selected option", selectedOption);
         //console.log("selected block", selectedBlock);
-
         const rows = parseInt(selectedBlock.dataset.row);
         const cols = parseInt(selectedBlock.dataset.col);
         const optData = selectedOption.dataset.opt;
@@ -607,7 +604,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //selection manager - options palette
     opt.addEventListener("click", function(opt) {
-        //console.log("OPTIONS palette event listener activated")
         //initial element test (if outside; removes all selected)
         const option = opt.target.closest(".options");
         if(!option) {
@@ -627,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function () {
         option.classList.add("selected");
         selectedOption = option;
 
-        //NOTE match instance
+        //NOTE match instance (option-side)
         if(selectedBlock){
             blockSubstitution();
             selectionRemoval();
@@ -658,7 +654,7 @@ document.addEventListener("DOMContentLoaded", function () {
         block.classList.add("selected");
         selectedBlock = block;
 
-        //NOTE match instance
+        //NOTE match instance (block-side)
         if(selectedOption){
             blockSubstitution();
             selectionRemoval();
@@ -715,13 +711,16 @@ Implementation Ref: update() | implement() | reset()
 */
 
 function redstone_block_update(y,x){
-    blocksV2[y][x] = blocksV1[y][x].clone();
-    console.log("time when blocksV2 was changed",blocksV2[y][x]);
-    blocksV2[y][x].setImg();
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
+        blocksV2[y][x] = blocksV1[y][x].clone();
+        blocksV2[y][x].setImg();
+    }
 }
 
 function redstone_dust_update(y,x){
-    if (ePowerTest(y,x)){
+    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
+    if (true){
         //direction availability - initial cleaning of edge "blocks"
         let dirTest = edgeIdentifier(y,x);
 
