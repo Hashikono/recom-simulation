@@ -499,9 +499,9 @@ function ePowerTest(y,x){
 
 //removes selection
 function selectionRemoval(){
-    //if(selectedOption) selectedOption.classList.remove("selected");
+    if(selectedOption) selectedOption.classList.remove("selected");
     if(selectedBlock) selectedBlock.classList.remove("selected");
-    //selectedOption = null;
+    selectedOption = null;
     selectedBlock = null;
 }
 
@@ -627,7 +627,8 @@ document.addEventListener("DOMContentLoaded", function () {
         //NOTE match instance (option-side)
         if(selectedBlock){
             blockSubstitution();
-            selectionRemoval();
+            if(selectedBlock) selectedBlock.classList.remove("selected");
+            selectedBlock = null;
         }
 
         //console.log("Selected option", option.dataset.opt)
@@ -658,7 +659,8 @@ document.addEventListener("DOMContentLoaded", function () {
         //NOTE match instance (block-side)
         if(selectedOption){
             blockSubstitution();
-            selectionRemoval();
+            if(selectedBlock) selectedBlock.classList.remove("selected");
+            selectedBlock = null;
         }
 
         //console.log("Selected block", block.dataset.row, block.dataset.col)
@@ -675,6 +677,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+ //(∞) update function
+var continuousUpdate = false;
+function wUpdate(){
+    continuousUpdate = !continuousUpdate;
+    let wupInt;
+
+    //color toggle
+    if (continuousUpdate){
+        document.getElementById("wupdate").style.backgroundColor = "#6bf3a1";
+        wupInt = setInterval(function() {
+            console.log("while update process...")
+            document.getElementById("wupdate").addEventListener("mouseup", function(){
+                continuousUpdate = !continuousUpdate; 
+                clearInterval(wupInt);
+                document.getElementById("wupdate").style.backgroundColor = "#d36868";
+            });
+        },500);
+    }
+}
 
 /*DEBUGGING selection stuff...
 console.log("Event listener tests...");
@@ -756,10 +778,18 @@ function redstone_dust_update(y,x){
         //if (dirTest.includes("4") && blocksV2[y][x-1].getBlockType() != "redstone_dust") blocksV2[y][x].getWestPort().setIo((() => {if (blocksV2[y][x-1].getEastPort().getIo() == "input"){return output;} else {return "input";}})());
         
         //rPower establishment
-        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && blocksV2[y-1][x].getSouthPort().getIo() == "output") blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && blocksV2[y][x+1].getWestPort().getIo() == "output") blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && blocksV2[y+1][x].getNorthPort().getIo() == "output") blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().travellingPowerOutput());
-        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && blocksV2[y][x-1].getEastPort().getIo() == "output") blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().travellingPowerOutput());
+        if (blocksV1[y][x].getDirection().toString().includes("1") && dirTest.includes("1") && blocksV2[y-1][x].getSouthPort().getIo() == "output"){
+            blocksV2[y][x].getNorthPort().setRPower(blocksV2[y-1][x].getSouthPort().getRPower()-1);
+        }
+        if (blocksV1[y][x].getDirection().toString().includes("2") && dirTest.includes("2") && blocksV2[y][x+1].getWestPort().getIo() == "output"){
+            blocksV2[y][x].getEastPort().setRPower(blocksV2[y][x+1].getWestPort().getRPower()-1);
+        }
+        if (blocksV1[y][x].getDirection().toString().includes("3") && dirTest.includes("3") && blocksV2[y+1][x].getNorthPort().getIo() == "output"){
+            blocksV2[y][x].getSouthPort().setRPower(blocksV2[y+1][x].getNorthPort().getRPower()-1);
+        }
+        if (blocksV1[y][x].getDirection().toString().includes("4") && dirTest.includes("4") && blocksV2[y][x-1].getEastPort().getIo() == "output"){
+            blocksV2[y][x].getWestPort().setRPower(blocksV2[y][x-1].getEastPort().getRPower()-1);
+        }
 
         //on/off establishment
         if (blocksV1[y][x].powerTest("r")){
