@@ -547,7 +547,8 @@ window.onload = (() => {update(); console.log("Content Initial load!")});
 document.addEventListener("DOMContentLoaded", function () {
     let opt = document.getElementById("blockPalette");
     let pla = document.getElementById("placementGrid");
-
+    
+    //removes selection
     function selectionRemoval(){
         if(selectedOption) selectedOption.classList.remove("selected");
         if(selectedBlock) selectedBlock.classList.remove("selected");
@@ -619,6 +620,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         //console.log("Selected block", block.dataset.row, block.dataset.col)
     });
+
+    //background option removal
+    document.addEventListener("click", function(event) {
+        const cElement = event.target;
+
+        //checks if element is the background
+        if (cElement === document.body || cElement === document.documentElement){
+            selectionRemoval();
+        }
+    });
+
 });
 
 /*DEBUGGING selection stuff...
