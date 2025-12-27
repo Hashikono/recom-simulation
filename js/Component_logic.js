@@ -157,24 +157,18 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     powerTest(x) { //boolean
         //tests and updates ePower
         if (x == "e" && (this.getNorthPort().getEPower() || this.getEastPort().getEPower() || this.getSouthPort().getEPower() || this.getWestPort().getEPower())){
-            this.portsList[0].setEPower(true);
-            this.portsList[1].setEPower(true);
-            this.portsList[2].setEPower(true);
-            this.portsList[3].setEPower(true);
+            //REVIEW Something's not working here...and idk why
+            this.getNorthPort().setEPower(true);
+            this.getEastPort().setEPower(true);
+            this.getSouthPort().setEPower(true);
+            this.getWestPort().setEPower(true);
             return true;
-        }
-        else if (x == "e") {
-            this.portsList[0].setEPower(false);
-            this.portsList[1].setEPower(false);
-            this.portsList[2].setEPower(false);
-            this.portsList[3].setEPower(false);
-            return false
         }
         //only tests rPower
         else if (x == "r" && (this.getNorthPort().getRPower() > 0 || this.getEastPort().getRPower() > 0 || this.getSouthPort().getRPower() > 0 || this.getWestPort().getRPower() > 0)){
             return true;
         }
-        else if (x == "r") {
+        else {
             return false;
         }
     }
@@ -245,10 +239,10 @@ function genBlock(block,y,x){
 
     //constructing surrounding blocks list
     let surBlock = ["air","air","air","air"];
-    if(dirTest.includes(1)){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
-    if(dirTest.includes(2)){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
-    if(dirTest.includes(3)){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
-    if(dirTest.includes(4)){surBlock[3] = blocksV1[y][x-1].getBlockType(); }
+    if(dirTest.includes("1")){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
+    if(dirTest.includes("2")){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
+    if(dirTest.includes("3")){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
+    if(dirTest.includes("4")){surBlock[3] = blocksV1[y][x-1].getBlockType(); }
 
     //implementation
     if (block == "air"){
@@ -477,10 +471,10 @@ function updateSurrounding(y,x){
     let dirTesting =edgeIdentifier(y,x);
     //constructing surrounding blocks list
     let surBlock = ["air","air","air","air"];
-    if(dirTesting.includes(1)){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
-    if(dirTesting.includes(2)){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
-    if(dirTesting.includes(3)){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
-    if(dirTesting.includes(4)){surBlock[3] = blocksV1[y][x-1].getBlockType(); } 
+    if(dirTesting.includes("1")){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
+    if(dirTesting.includes("2")){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
+    if(dirTesting.includes("3")){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
+    if(dirTesting.includes("4")){surBlock[3] = blocksV1[y][x-1].getBlockType(); } 
 
     blocksV2[y][x].getNorthPort().setConBlockType(surBlock[0]);
     blocksV2[y][x].getEastPort().setConBlockType(surBlock[1]);
@@ -502,13 +496,68 @@ function edgeIdentifier(y,x){
 function ePowerTest(y,x){
     let power = false;
     let testBlocks = edgeIdentifier(y,x);
+    console.log("testsblocksss:", testBlocks);
+    //tests ePower for all ports
+    if (testBlocks.includes("1")) {
+        if (blocksV1[y-1][x].getBlockType() != "air"){
+            if (blocksV1[y-1][x].powerTest("e")){
+                power = true;
+            }
+            else {
+                console.log("1.2: powertest failed");
+            }
+        } 
+        else {
+            console.log("1.1 blocktype was air");
+        }
+    }
+    else if (testBlocks.includes("2")) {
+        if (blocksV1[y][x+1].getBlockType() != "air"){
+            if (blocksV1[y][x+1].powerTest("e")){
+                power = true;
+            }
+            else {
+                console.log("2.2: powertest failed with block",blocksV1[y][x+1]);
+            }
+        } 
+        else {
+            console.log("2.1 blocktype was air");
+        }     
+    }
+    else if (testBlocks.includes("3")) {
+        if (blocksV1[y+1][x].getBlockType() != "air"){
+            if (blocksV1[y+1][x].powerTest("e")){
+                power = true;
+            }
+            else {
+                console.log("3.2: powertest failed");
+            }
+        } 
+        else {
+            console.log("3.1 blocktype was air");
+        }
+    }
+    else if (testBlocks.includes("4")) {
+        if (blocksV1[y][x-1].getBlockType() != "air"){
+            if (blocksV1[y][x-1].powerTest("e")){
+                power = true;
+            }
+            else {
+                console.log("4.2: powertest failed");
+            }
+        } 
+        else {
+            console.log("4.1 blocktype was air");
+        }
+    }
+    console.log("power ended up being",power);
 
     //sets ePower for all ports
-    //*small comment, I love how references work bcs it only changes the obj and not the string (when I used an oddly specific feature in coding that the designers may or may not have intentially made moment lol)
-    if (testBlocks.includes(1) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y-1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(2) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x+1].powerTest("e")){power = true; }
-    else if (testBlocks.includes(3) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y+1][x].powerTest("e")){power = true; }
-    else if (testBlocks.includes(4) && blocksV1[y][x].getBlockType() != "air" && blocksV1[y][x-1].powerTest("e")){power = true; }
+    blocksV2[y][x].getNorthPort().setEPower(power);
+    blocksV2[y][x].getEastPort().setEPower(power);
+    blocksV2[y][x].getSouthPort().setEPower(power);
+    blocksV2[y][x].getWestPort().setEPower(power);
+    console.log("after ePower update:", blocksV2[y][x]);
 
     return power;
 }
@@ -521,9 +570,9 @@ function selectionRemoval(){
     selectedBlock = null;
 }
 
-//Updates the blocks list (and image list)
+//NOTE Updates the blocks list (and image list)
 function update(){
-    console.log("Block update!");
+    console.log("--------------------------- Block update! ---------------------------");
     //Does the corresponding update function for each corresponding block
     for(let r = 0; r < blocksV1.length; r++){
         for (let c = 0; c < blocksV1[0].length; c++){
@@ -567,7 +616,7 @@ function update(){
     
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
     implement();
-    console.log(blocksV1);
+    console.log("blocksV1[0]:", blocksV1[0]);
 }   
 
 //Implements the blocks list into the grid (HTML creation)
@@ -759,16 +808,16 @@ function air_update(y,x){
 }
 
 function redstone_block_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function redstone_dust_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
         //direction availability - initial cleaning of edge "blocks"
         let dirTest = edgeIdentifier(y,x);
 
@@ -807,14 +856,9 @@ function redstone_dust_update(y,x){
         else if (dirPrior.length == 2 || dirPrior.length == 3){
             blocksV2[y][x].setDirection(parseInt(dirPrior.join("")));
         }
-        console.log("getdirection",blocksV1[y][x].getDirection());
-
-        //REVIEW Get the lone redstone dust direction thing to work
-
-        let rPowe = 0;
-        //REVIEW Do max algorithm to find maximum output
 
         //rPower establishment
+        let rPowe = 0;
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
         if (dirTest.includes("1") && blocksV1[y][x].getDirection().toString().includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
             if (blocksV2[y-1][x].getSouthPort().getRPower()-1 > rPowe) rPowe = blocksV2[y-1][x].getSouthPort().getRPower()-1;
@@ -846,59 +890,57 @@ function redstone_dust_update(y,x){
 }
 
 function redstone_repeator_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function redstone_comparator_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function redstone_lamp_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function oak_button_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function note_block_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function lever_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
 function observer_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
+    blocksV2[y][x] = blocksV1[y][x].clone();
+    if (ePowerTest(y,x)){
+        //
     }
 }
 
+//REVIEW Cobblestone not fully implemented
 function cobblestone_update(y,x){
-    //REVIEW Change back to this when cobblestone is coded: ePowerTest(y,x)
-    if (true){
-        blocksV2[y][x] = blocksV1[y][x].clone();
-    }
+    blocksV2[y][x] = blocksV1[y][x].clone();
 }
 
 
