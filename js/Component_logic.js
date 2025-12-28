@@ -20,7 +20,7 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
 
     //get methods for port data
     getEPower() { //boolean
-        return this.sePow; 
+        return this.ePow; 
     }
     
     getRPower() { //integer
@@ -157,13 +157,14 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
     powerTest(x) { //boolean
         //tests and updates ePower
         if (x == "e" && (this.getNorthPort().getEPower() || this.getEastPort().getEPower() || this.getSouthPort().getEPower() || this.getWestPort().getEPower())){
-            //REVIEW Something's not working here...and idk why
             this.getNorthPort().setEPower(true);
             this.getEastPort().setEPower(true);
             this.getSouthPort().setEPower(true);
             this.getWestPort().setEPower(true);
+            console.log("POWERTEST powertest(e) executed");
             return true;
         }
+
         //only tests rPower
         else if (x == "r" && (this.getNorthPort().getRPower() > 0 || this.getEastPort().getRPower() > 0 || this.getSouthPort().getRPower() > 0 || this.getWestPort().getRPower() > 0)){
             return true;
@@ -496,7 +497,7 @@ function edgeIdentifier(y,x){
 function ePowerTest(y,x){
     let power = false;
     let testBlocks = edgeIdentifier(y,x);
-    console.log("testsblocksss:", testBlocks);
+    console.log("ePowerTest allowed directions:", testBlocks);
     //tests ePower for all ports
     if (testBlocks.includes("1")) {
         if (blocksV1[y-1][x].getBlockType() != "air"){
@@ -511,7 +512,7 @@ function ePowerTest(y,x){
             console.log("1.1 blocktype was air");
         }
     }
-    else if (testBlocks.includes("2")) {
+    if (testBlocks.includes("2")) {
         if (blocksV1[y][x+1].getBlockType() != "air"){
             if (blocksV1[y][x+1].powerTest("e")){
                 power = true;
@@ -524,7 +525,7 @@ function ePowerTest(y,x){
             console.log("2.1 blocktype was air");
         }     
     }
-    else if (testBlocks.includes("3")) {
+    if (testBlocks.includes("3")) {
         if (blocksV1[y+1][x].getBlockType() != "air"){
             if (blocksV1[y+1][x].powerTest("e")){
                 power = true;
@@ -537,7 +538,7 @@ function ePowerTest(y,x){
             console.log("3.1 blocktype was air");
         }
     }
-    else if (testBlocks.includes("4")) {
+    if (testBlocks.includes("4")) {
         if (blocksV1[y][x-1].getBlockType() != "air"){
             if (blocksV1[y][x-1].powerTest("e")){
                 power = true;
