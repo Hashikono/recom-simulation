@@ -932,12 +932,13 @@ function redstone_dust_update(y,x){ //DONE
 
 
     if (ePowerTest(y,x)){
-        //Max rPower establishment
+        //Max rPower establishment (applies to next 50 something lines of code)
         let rPowMax = 0;
         //source change indicator
         let delta = false;
 
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
+        //North
         if (dirTest.includes("1") && blocksV2[y][x].getDirection().toString().includes("1")){
             if ((blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
                 if (blocksV1[y-1][x].getSouthPort().getRPower()-1 > rPowMax){
@@ -950,6 +951,7 @@ function redstone_dust_update(y,x){ //DONE
                 delta = true;
             }
         }
+        //East
         if (dirTest.includes("2") && blocksV2[y][x].getDirection().toString().includes("2")){
             if ((blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
                 if (blocksV1[y][x+1].getWestPort().getRPower()-1 > rPowMax){
@@ -960,6 +962,7 @@ function redstone_dust_update(y,x){ //DONE
                 delta = true;
             }
         }
+        //South
         if (dirTest.includes("3") && blocksV2[y][x].getDirection().toString().includes("3")){
             if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
                 if (blocksV1[y+1][x].getNorthPort().getRPower()-1 > rPowMax){
@@ -970,6 +973,7 @@ function redstone_dust_update(y,x){ //DONE
                 delta = true;
             }
         }
+        //West
         if (dirTest.includes("4") && blocksV2[y][x].getDirection().toString().includes("4")){
             if ((blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
                 if (blocksV1[y][x-1].getEastPort().getRPower()-1 > rPowMax){
@@ -1033,17 +1037,44 @@ function redstone_comparator_update(y,x){
 function redstone_lamp_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
-        //Max rPower establishment
+        //Max rPower establishment (applies to next 50 something lines of code)
         let rPowMax = 0;
         //source change indicator
         let delta = false;
 
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
-        if (dirTest.includes("1") && blocksV2[y][x].getDirection().toString().includes("1")){
-            if ((blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
+        //North
+        if (dirTest.includes("1")){
+            //regular output case
+            if (blocksV1[y-1][x].getSouthPort().getIo() == "output" && 
+                (blocksV1[y-1][x].getSouthPort().getBlockType() != "redstone_block" || 
+                blocksV1[y-1][x].getSouthPort().getBlockType() != "redstone_block")){
+                /*- "redstone_block"
+                    
+                    - "redstone_repeator"
+                    - "redstone_comparator"
+                    - "redstone_lamp"
+
+                    - "oak_button"
+                    - "note_block"
+                    - "lever"
+                    - "observer"
+                    - "cobblestone"
+                    - "air" 
+                */
+                    
+
                 if (blocksV1[y-1][x].getSouthPort().getRPower()-1 > rPowMax){
                     rPowMax = blocksV1[y-1][x].getSouthPort().getRPower()-1;
                 }
+            }
+            //block rPower transfer case
+            else if (true){
+
+            }
+            //redstone dust special case
+            else if (blocksV1[y-1][x].getBlockType() == "redstone_dust"){
+
             }
             //checks for block type change
             //If statement: 1.identifies surrounding source block; 2.identifies missing power source
@@ -1051,31 +1082,43 @@ function redstone_lamp_update(y,x){
                 delta = true;
             }
         }
-        if (dirTest.includes("2") && blocksV2[y][x].getDirection().toString().includes("2")){
-            if ((blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
+        //East
+        if (dirTest.includes("2")){
+            if ((blocksV1[y][x+1].getWestPort().getIo() == "output" && (blocksV1[y][x+1].getWestPort().getBlockType() != "redstone_block" || blocksV1[y][x+1].getWestPort().getBlockType() != "redstone_block")){
                 if (blocksV1[y][x+1].getWestPort().getRPower()-1 > rPowMax){
                     rPowMax = blocksV1[y][x+1].getWestPort().getRPower()-1;
                 }
+            }
+            else if (blocksV1[y][x+1].getBlockType() == "redstone_dust"){
+
             }
             if (blocksV1[y][x+1].getBlockType() != blocksV2[y][x+1].getBlockType()){
                 delta = true;
             }
         }
-        if (dirTest.includes("3") && blocksV2[y][x].getDirection().toString().includes("3")){
-            if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
+        //South
+        if (dirTest.includes("3")){
+            if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" && (blocksV1[y+1][x].getNorthPort().getBlockType() != "redstone_block" || blocksV1[y+1][x].getNorthPort().getBlockType() != "redstone_block")){
                 if (blocksV1[y+1][x].getNorthPort().getRPower()-1 > rPowMax){
                     rPowMax = blocksV1[y+1][x].getNorthPort().getRPower()-1;
                 }
+            }
+            else if (blocksV1[y+1][x].getBlockType() == "redstone_dust"){
+
             }
             if (blocksV1[y+1][x].getBlockType() != blocksV2[y+1][x].getBlockType()){
                 delta = true;
             }
         }
-        if (dirTest.includes("4") && blocksV2[y][x].getDirection().toString().includes("4")){
-            if ((blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
+        //West
+        if (dirTest.includes("4")){
+            if ((blocksV1[y][x-1].getEastPort().getIo() == "output" && (blocksV1[y][x-1].getEastPort().getBlockType() != "redstone_block" || blocksV1[y][x-1].getEastPort().getBlockType() != "redstone_block")){
                 if (blocksV1[y][x-1].getEastPort().getRPower()-1 > rPowMax){
                     rPowMax = blocksV1[y][x-1].getEastPort().getRPower()-1;
                 }
+            }
+            else if (blocksV1[y][x-1].getBlockType() == "redstone_dust"){
+
             }
             if (blocksV1[y][x-1].getBlockType() != blocksV2[y][x-1].getBlockType()){
                 delta = true;
@@ -1106,7 +1149,7 @@ function redstone_lamp_update(y,x){
         blocksV2[y][x].getSouthPort().setEPower(false);
         blocksV2[y][x].getWestPort().setEPower(false);
         
-        //turning "off" dust
+        //turning off lamp
         if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
         if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
         if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
