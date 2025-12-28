@@ -161,7 +161,6 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
             this.getEastPort().setEPower(true);
             this.getSouthPort().setEPower(true);
             this.getWestPort().setEPower(true);
-            console.log("POWERTEST powertest(e) executed");
             return true;
         }
 
@@ -497,7 +496,7 @@ function edgeIdentifier(y,x){
 function ePowerTest(y,x){
     let power = false;
     let testBlocks = edgeIdentifier(y,x);
-    console.log("ePowerTest allowed directions:", testBlocks);
+    //console.log("ePowerTest allowed directions:", testBlocks);
     //tests ePower for all ports
     if (testBlocks.includes("1")) {
         if (blocksV1[y-1][x].getBlockType() != "air"){
@@ -505,11 +504,11 @@ function ePowerTest(y,x){
                 power = true;
             }
             else {
-                console.log("1.2: powertest failed");
+                //console.log("1.2: powertest failed");
             }
         } 
         else {
-            console.log("1.1 blocktype was air");
+            //console.log("1.1 blocktype was air");
         }
     }
     if (testBlocks.includes("2")) {
@@ -518,11 +517,11 @@ function ePowerTest(y,x){
                 power = true;
             }
             else {
-                console.log("2.2: powertest failed with block",blocksV1[y][x+1]);
+                //console.log("2.2: powertest failed with block",blocksV1[y][x+1]);
             }
         } 
         else {
-            console.log("2.1 blocktype was air");
+            //console.log("2.1 blocktype was air");
         }     
     }
     if (testBlocks.includes("3")) {
@@ -531,11 +530,11 @@ function ePowerTest(y,x){
                 power = true;
             }
             else {
-                console.log("3.2: powertest failed");
+                //console.log("3.2: powertest failed");
             }
         } 
         else {
-            console.log("3.1 blocktype was air");
+            //console.log("3.1 blocktype was air");
         }
     }
     if (testBlocks.includes("4")) {
@@ -544,21 +543,21 @@ function ePowerTest(y,x){
                 power = true;
             }
             else {
-                console.log("4.2: powertest failed");
+                //console.log("4.2: powertest failed");
             }
         } 
         else {
-            console.log("4.1 blocktype was air");
+            //console.log("4.1 blocktype was air");
         }
     }
-    console.log("power ended up being",power);
+    //console.log("power ended up being",power);
 
     //sets ePower for all ports
     blocksV2[y][x].getNorthPort().setEPower(power);
     blocksV2[y][x].getEastPort().setEPower(power);
     blocksV2[y][x].getSouthPort().setEPower(power);
     blocksV2[y][x].getWestPort().setEPower(power);
-    console.log("after ePower update:", blocksV2[y][x]);
+    //console.log("after ePower update:", blocksV2[y][x]);
 
     return power;
 }
@@ -815,10 +814,13 @@ function redstone_block_update(y,x){
     }
 }
 
+//REVIEW Turn off redstone dust when no power source is detected
+//REVIEW update redstone dust direction even without ePower
+//REVIEW Turn off all redstone dust when ePower isn't detected
+
 function redstone_dust_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
-        //
         //direction availability - initial cleaning of edge "blocks"
         let dirTest = edgeIdentifier(y,x);
 
@@ -858,27 +860,45 @@ function redstone_dust_update(y,x){
             blocksV2[y][x].setDirection(parseInt(dirPrior.join("")));
         }
 
-        //rPower establishment
-        let rPowe = 0;
+        //Max rPower establishment
+        let rPowMax = 0;
+        //source change indicator
+        let delta = false;
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
-        if (dirTest.includes("1") && blocksV1[y][x].getDirection().toString().includes("1") && (blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
-            if (blocksV2[y-1][x].getSouthPort().getRPower()-1 > rPowe) rPowe = blocksV2[y-1][x].getSouthPort().getRPower()-1;
+        if (dirTest.includes("1") && blocksV1[y][x].getDirection().toString().includes("1")){
+            if ((blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust") && blocksV2[y-1][x].getSouthPort().getRPower()-1 > rPowMax) rPowMax = blocksV2[y-1][x].getSouthPort().getRPower()-1;
+            //If statement: 1.identifies surrounding source block; 2.identifies missing power source
+            if (blocksV1[y-1][x].getSouthPort().getRPower() > 1 && blocksV2[y-1][x].getSouthPort().getRPower() == 0){
+                delta = true;
+            }
         }
-        if (dirTest.includes("2") && blocksV1[y][x].getDirection().toString().includes("2") && (blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
-            if (blocksV2[y][x+1].getWestPort().getRPower()-1 > rPowe) rPowe = blocksV2[y][x+1].getWestPort().getRPower()-1;
+        if (dirTest.includes("2") && blocksV1[y][x].getDirection().toString().includes("2")){
+            if ((blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust") && blocksV2[y][x+1].getWestPort().getRPower()-1 > rPowMax) rPowMax = blocksV2[y][x+1].getWestPort().getRPower()-1;
+            if (blocksV1[y][x+1].getWestPort().getRPower() > 1 && blocksV2[y][x+1].getWestPort().getRPower() == 0){ 
+                delta = true;
+            }
         }
-        if (dirTest.includes("3") && blocksV1[y][x].getDirection().toString().includes("3") && (blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
-            if (blocksV2[y+1][x].getNorthPort().getRPower()-1 > rPowe) rPowe = blocksV2[y+1][x].getNorthPort().getRPower()-1;
+        if (dirTest.includes("3") && blocksV1[y][x].getDirection().toString().includes("3")){
+            if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust") && blocksV2[y+1][x].getNorthPort().getRPower()-1 > rPowMax) rPowMax = blocksV2[y+1][x].getNorthPort().getRPower()-1;
+            if (blocksV1[y+1][x].getNorthPort().getRPower() > 1 && blocksV2[y+1][x].getNorthPort().getRPower() == 0){ 
+                delta = true;
+            }
         }
-        if (dirTest.includes("4") && blocksV1[y][x].getDirection().toString().includes("4") && (blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
-            if (blocksV2[y][x-1].getEastPort().getRPower()-1 > rPowe) rPowe = blocksV2[y][x-1].getEastPort().getRPower()-1;
+        if (dirTest.includes("4") && blocksV1[y][x].getDirection().toString().includes("4")){
+            if ((blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust") && blocksV2[y][x-1].getEastPort().getRPower()-1 > rPowMax) rPowMax = blocksV2[y][x-1].getEastPort().getRPower()-1;
+            if (blocksV1[y][x-1].getEastPort().getRPower() > 1 && blocksV2[y][x-1].getEastPort().getRPower() == 0){ 
+                delta = true;
+            }
         }
-        
-        //maximum power output
-        if (blocksV1[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowe); 
-        if (blocksV1[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowe);
-        if (blocksV1[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowe);
-        if (blocksV1[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowe);
+
+        //maximum power output (with/without change)
+        if (delta) rPowMax = 0;
+        if (blocksV1[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowMax); 
+        if (blocksV1[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowMax);
+        if (blocksV1[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowMax);
+        if (blocksV1[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowMax);
+
+
 
         //on/off establishment
         if (blocksV1[y][x].powerTest("r")){
