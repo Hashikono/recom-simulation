@@ -1037,6 +1037,7 @@ function redstone_comparator_update(y,x){
 function redstone_lamp_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
+        /*
         //Max rPower establishment (applies to next 50 something lines of code)
         let rPowMax = 0;
         //source change indicator
@@ -1049,7 +1050,7 @@ function redstone_lamp_update(y,x){
             if (blocksV1[y-1][x].getSouthPort().getIo() == "output" && 
                 (blocksV1[y-1][x].getSouthPort().getBlockType() != "redstone_block" || 
                 blocksV1[y-1][x].getSouthPort().getBlockType() != "redstone_block")){
-                /*- "redstone_block"
+                - "redstone_block"
                     
                     - "redstone_repeator"
                     - "redstone_comparator"
@@ -1061,7 +1062,7 @@ function redstone_lamp_update(y,x){
                     - "observer"
                     - "cobblestone"
                     - "air" 
-                */
+                
                     
 
                 if (blocksV1[y-1][x].getSouthPort().getRPower()-1 > rPowMax){
@@ -1141,6 +1142,7 @@ function redstone_lamp_update(y,x){
         else {
             blocksV2[y][x].setImgPower("off");
         }
+        */
     }
     else {
         //no ePower
