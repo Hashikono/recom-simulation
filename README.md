@@ -6,7 +6,7 @@
 
 ## Features
 * Near accurate Minecraft Redstone Simulation
-* Electric presence simulation
+* Electric presence simulation (cobblestone acts also as a battery)
 * Stepper type updater
 * Redstone Lamps light up (So coool XD)
 
@@ -31,6 +31,7 @@ You have **2** options:
     * Note that the block will stay in use unless you click outside of the placement grid
 * Click on any of the bottom placement grid cells to place your desired block (stone blocks)
 * To allow for the components to update, you must place a (battery) cobblestone block near or right next to the power-source block (Redstone Blocks are power-source blocks)
+    * This is to simulate the presence of a battery/electrical power in the grid
 * <u>**IMPORTANT:**</u> The green totally unmissable "Update (spam)" button at the top acts like a stepper, if you want to update your grid fully you must **SPAM** the button!!!
 * To clear the grid, simply press the "Clear" button
 * To get rid of individual blocks, just click the "stone" block at the very end of the palette (stone = empty/air)
