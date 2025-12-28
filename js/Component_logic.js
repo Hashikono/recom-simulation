@@ -939,7 +939,7 @@ function redstone_dust_update(y,x){ //DONE
         //check every direction for valid power source
         for (const direction of dirTest){
             //direction irrelevance test
-            if (!blocksV2[y][x].getDirection().toString().includes(dir)) continue;
+            if (!blocksV2[y][x].getDirection().toString().includes(direction)) continue;
 
             //storing neighboring/next/new values (yeah call it whatever you want)
             let neighY = y;
@@ -952,9 +952,8 @@ function redstone_dust_update(y,x){ //DONE
                 case "4": neighX = x-1; break;
             }
 
-
-
             //checking neighboring blocks
+            if (neighY < 0 || neighY >= 6 || neighX < 0 || neighX >= 6) continue;
             const neighbor = blocksV1[neighY][neighX];
             let powerProvision = false;
             let neighborPower = 0;
@@ -997,6 +996,7 @@ function redstone_dust_update(y,x){ //DONE
             if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowMax);
             if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowMax);
             if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowMax);
+            blocksV2[y][x].setImgPower("on");
         } 
         else {
             //no valid power source
@@ -1041,8 +1041,8 @@ function redstone_dust_update(y,x){ //DONE
         visited.add(coor);
 
         //check if block is a power source
-        if (blocksV1[newY][newX].getBlockType() == "redstone_block" || (block.powerTest("r") && block.travellingPowerOutput() > 0)){
-            return true
+        if (blocksV1[newY][newX].getBlockType() == "redstone_block" || (blocksV1[newY][newX].powerTest("r") && blocksV1[newY][newX].travellingPowerOutput() > 0)){
+            return true;
         }
 
         //checking all directions
@@ -1107,9 +1107,103 @@ function redstone_lamp_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
     let dirTest = edgeIdentifier(y,x);
     if (ePowerTest(y,x)){
+        //track outputs
+        let outputList = ["1","2","3","4"];
         //Max rPower establishment (applies to next 50 something lines of code)
         let powerr = false;
 
+        //SETTING OUTPUTS
+        //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
+        //North
+        if (dirTest.includes("1")){
+            //regular output case
+            if (
+                blocksV1[y-1][x].getBlockType() != "redstone_block" && 
+                blocksV1[y-1][x].getSouthPort().getIo() == "output" && 
+                blocksV1[y-1][x].getSouthPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("1"),1);
+                powerr = true;
+            }
+            else if (
+                blocksV1[y-1][x].getBlockType() == "redstone_dust" && 
+                blocksV1[y-1][x].getDirection().toString().includes("3") && 
+                blocksV1[y-1][x].getSouthPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("1"),1);
+                powerr = true;
+            }
+        }
+        //East
+        if (dirTest.includes("2")){
+            //regular output case
+            if (
+                blocksV1[y][x+1].getBlockType() != "redstone_block" && 
+                blocksV1[y][x+1].getWestPort().getIo() == "output" && 
+                blocksV1[y][x+1].getWestPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("2"),1);
+                powerr = true;
+            }
+            else if (
+                blocksV1[y][x+1].getBlockType() == "redstone_dust" && 
+                blocksV1[y][x+1].getDirection().toString().includes("4") && 
+                blocksV1[y][x+1].getWestPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("2"),1);
+                powerr = true;
+            }
+        }
+        //South
+        if (dirTest.includes("3")){
+            //regular output case
+            if (
+                blocksV1[y+1][x].getBlockType() != "redstone_block" && 
+                blocksV1[y+1][x].getNorthPort().getIo() == "output" && 
+                blocksV1[y+1][x].getNorthPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("3"),1);
+                powerr = true;
+            }
+            else if (
+                blocksV1[y+1][x].getBlockType() == "redstone_dust" && 
+                blocksV1[y+1][x].getDirection().toString().includes("1") && 
+                blocksV1[y+1][x].getNorthPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("3"),1);
+                powerr = true;
+            }
+        }
+        //West
+        if (dirTest.includes("4")){
+            //regular output case
+            if (
+                blocksV1[y][x-1].getBlockType() != "redstone_block" && 
+                blocksV1[y][x-1].getEastPort().getIo() == "output" && 
+                blocksV1[y][x-1].getEastPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("4"),1);
+                powerr = true;
+            }
+            else if (
+                blocksV1[y][x-1].getBlockType() == "redstone_dust" && 
+                blocksV1[y][x-1].getDirection().toString().includes("2") && 
+                blocksV1[y][x-1].getEastPort().getRPower() > 0
+                ){
+                outputList.splice(outputList.indexOf("4"),1);
+                powerr = true;
+            }
+        }
+
+        //sets outputs in output list as outputs
+        if (outputList.includes("1")) blocksV2[y][x].getNorthPort().setIo("output");
+        if (outputList.includes("2")) blocksV2[y][x].getEastPort().setIo("output");
+        if (outputList.includes("3")) blocksV2[y][x].getSouthPort().setIo("output");
+        if (outputList.includes("4")) blocksV2[y][x].getWestPort().setIo("output");
+        
+
+
+        //SETSPOWERR
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
         //North
         if (dirTest.includes("1")){
@@ -1169,7 +1263,6 @@ function redstone_lamp_update(y,x){ //DONE
         }
 
         //on/off establishment
-        console.log("powerrrrr value:", powerr);
         if (powerr){
             blocksV2[y][x].setImgPower("on");
             if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(1); 
