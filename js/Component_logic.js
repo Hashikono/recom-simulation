@@ -495,71 +495,127 @@ function edgeIdentifier(y,x){
 //tests ePower on surrounding blocks
 function ePowerTest(y,x){
     let power = false;
-    let testBlocks = edgeIdentifier(y,x);
-    //console.log("ePowerTest allowed directions:", testBlocks);
-    //tests ePower for all ports
-    if (testBlocks.includes("1")) {
-        if (blocksV1[y-1][x].getBlockType() != "air"){
-            if (blocksV1[y-1][x].powerTest("e")){
-                power = true;
-            }
-            else {
-                //console.log("1.2: powertest failed");
-            }
-        } 
-        else {
-            //console.log("1.1 blocktype was air");
-        }
-    }
-    if (testBlocks.includes("2")) {
-        if (blocksV1[y][x+1].getBlockType() != "air"){
-            if (blocksV1[y][x+1].powerTest("e")){
-                power = true;
-            }
-            else {
-                //console.log("2.2: powertest failed with block",blocksV1[y][x+1]);
-            }
-        } 
-        else {
-            //console.log("2.1 blocktype was air");
-        }     
-    }
-    if (testBlocks.includes("3")) {
-        if (blocksV1[y+1][x].getBlockType() != "air"){
-            if (blocksV1[y+1][x].powerTest("e")){
-                power = true;
-            }
-            else {
-                //console.log("3.2: powertest failed");
-            }
-        } 
-        else {
-            //console.log("3.1 blocktype was air");
-        }
-    }
-    if (testBlocks.includes("4")) {
-        if (blocksV1[y][x-1].getBlockType() != "air"){
-            if (blocksV1[y][x-1].powerTest("e")){
-                power = true;
-            }
-            else {
-                //console.log("4.2: powertest failed");
-            }
-        } 
-        else {
-            //console.log("4.1 blocktype was air");
-        }
-    }
-    //console.log("power ended up being",power);
 
-    //sets ePower for all ports
+    //checks if block is cobblestone
+    if (blocksV1[y][x].getBlockType() == "cobblestone"){
+        power = true;
+    }
+    else {
+        //cobblestone traceback
+        let testBlocks = edgeIdentifier(y,x);
+        let visited = new Set();
+        for (const direction of testBlocks){
+            let neighY = y;
+            let neighX = x;
+            switch(direction){
+                case "1": neighY = y-1; break;
+                case "2": neighY = x+1; break;
+                case "3": neighY = y+1; break;
+                case "4": neighY = x-1; break;
+            }
+
+            //connection checking
+            const neighboring = blocksV1[neighY][neighX];
+            if (neighboring.getBlockType() != "air"){
+                //successful connection tracker
+                let sConnect = false;
+                switch(direction) {
+                    case "1": sConnect = neighboring.getSouthPort().getEPower(); break;
+                    case "2": sConnect = neighboring.getWestPort().getEPower(); break;
+                    case "3": sConnect = neighboring.getNorthPort().getEPower(); break;
+                    case "4": sConnect = neighboring.getEastPort().getEPower(); break;
+                }
+                //successful connection establishment
+                if (sConnect){
+                    if (successfulPath(neighY, neighX, y, x, visited)){
+                        power = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //setting and returning power result
     blocksV2[y][x].getNorthPort().setEPower(power);
     blocksV2[y][x].getEastPort().setEPower(power);
     blocksV2[y][x].getSouthPort().setEPower(power);
     blocksV2[y][x].getWestPort().setEPower(power);
-    //console.log("after ePower update:", blocksV2[y][x]);
-
     return power;
+}
+
+//ePowerTest path succession tester
+function successfulPath(neighY, neighX, y, x, visited){
+    //path finding :l
+    let queue = [[neighY,neighX,y,x]];
+    //avoiding duplicates in visitation
+    let localVisited = new Set([`${neighY}, ${neighX}`]);
+
+    while (queue.length > 0){
+        let cobbleY = queue.shift();
+        let cobbleX = queue.shift();
+        let fromY = queue.shift();
+        let fromX = queue.shift();
+
+        //cobblestone found
+        if (blocksV1[cobbleY][cobbleX].getBlockType() == "cobblestone"){
+            return true;
+        }
+
+        //checking all (valid) directions
+        let dirTest = edgeIdentifier(cobbleY,cobbleX);
+        if (dirTest.includes("1") && !(cobbleY-1 == fromY && cobbleX == fromX)){
+            let newY = cobbleY-1;
+            let newX = cobbleX;
+            if (!localVisited.has(`${newY},${newX}`)) {
+                const neighbor = blocksV1[newY][newX];
+                if (neighbor.getBlockType() != "air" && neighbor.getSouthPort().getEPower()){
+                    queue.push([newY, newX, cobbleY, cobbleX]);
+                    localVisited.add(`${newY},${newX}`);
+                }
+            }
+        }
+
+        if (dirTest.includes("2") && !(cobbleY == fromY && cobbleX+1 == fromX)){
+            let newY = cobbleY;
+            let newX = cobbleX+1;
+            if (!localVisited.has(`${newY},${newX}`)) {
+                const neighbor = blocksV1[newY][newX];
+                if (neighbor.getBlockType() != "air" && neighbor.getWestPort().getEPower()){
+                    queue.push([newY, newX, cobbleY, cobbleX]);
+                    localVisited.add(`${newY},${newX}`);
+                }
+            }
+        }
+
+        if (dirTest.includes("3") && !(cobbleY+1 == fromY && cobbleX == fromX)){
+            let newY = cobbleY+1;
+            let newX = cobbleX;
+            if (!localVisited.has(`${newY},${newX}`)) {
+                const neighbor = blocksV1[newY][newX];
+                if (neighbor.getBlockType() != "air" && neighbor.getNorthPort().getEPower()){
+                    queue.push([newY, newX, cobbleY, cobbleX]);
+                    localVisited.add(`${newY},${newX}`);
+                }
+            }
+        }
+
+        if (dirTest.includes("4") && !(cobbleY == fromY && cobbleX-1 == fromX)){
+            let newY = cobbleY;
+            let newX = cobbleX-1;
+            if (!localVisited.has(`${newY},${newX}`)) {
+                const neighbor = blocksV1[newY][newX];
+                if (neighbor.getBlockType() != "air" && neighbor.getEastPort().getEPower()){
+                    queue.push([newY, newX, cobbleY, cobbleX]);
+                    localVisited.add(`${newY},${newX}`);
+                }
+            }
+        }
+
+    }
+
+    //if cobblestone is never found...
+    return false;
 }
 
 //removes selection
@@ -797,28 +853,31 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
            get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
            *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-Function Ref: genEmptyBlock() | genBlock(block,y,x) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval() | updateSurrounding(y,x)
+Function Ref: genEmptyBlock() | genBlock(block,y,x) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval() | updateSurrounding(y,x) | successfulPath(neighY, neighX, y, x, visited)
 
 Implementation Ref: update() | implement() | reset() | testAbsurdity(option)
 
 */
 
-function air_update(y,x){
+function air_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
 }
 
-function redstone_block_update(y,x){
+function redstone_block_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
-    if (ePowerTest(y,x)){
-        //
+    if (!ePowerTest(y,x)){
+        //no ePower (turns off dust)
+        blocksV2[y][x].getNorthPort().setEPower(false);
+        blocksV2[y][x].getEastPort().setEPower(false);
+        blocksV2[y][x].getSouthPort().setEPower(false);
+        blocksV2[y][x].getWestPort().setEPower(false);
+
+        //turns image off
+        blocksV2[y][x].setImgPower("off");
     }
 }
 
-//REVIEW Turn off redstone dust when no power source is detected
-//REVIEW update redstone dust direction even without ePower
-//REVIEW Turn off all redstone dust when ePower isn't detected
-
-function redstone_dust_update(y,x){
+function redstone_dust_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
 
         //direction availability - initial cleaning of edge "blocks"
@@ -929,11 +988,17 @@ function redstone_dust_update(y,x){
         }
     }
     else {
-        //no ePower (turns off dust)
-        blocksV2[y][x].getNorthPort().setEPower(0);
-        blocksV2[y][x].getEastPort().setEPower(0);
-        blocksV2[y][x].getSouthPort().setEPower(0);
-        blocksV2[y][x].getWestPort().setEPower(0);
+        //no ePower
+        blocksV2[y][x].getNorthPort().setEPower(false);
+        blocksV2[y][x].getEastPort().setEPower(false);
+        blocksV2[y][x].getSouthPort().setEPower(false);
+        blocksV2[y][x].getWestPort().setEPower(false);
+        
+        //turning "off" dust
+        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
+        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
+        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
+        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
 
         //turns image off
         blocksV2[y][x].setImgPower("off");
@@ -957,7 +1022,87 @@ function redstone_comparator_update(y,x){
 function redstone_lamp_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
-        //
+        //Max rPower establishment
+        let rPowMax = 0;
+        //source change indicator
+        let delta = false;
+
+        //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
+        if (dirTest.includes("1") && blocksV2[y][x].getDirection().toString().includes("1")){
+            if ((blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
+                if (blocksV1[y-1][x].getSouthPort().getRPower()-1 > rPowMax){
+                    rPowMax = blocksV1[y-1][x].getSouthPort().getRPower()-1;
+                }
+            }
+            //checks for block type change
+            //If statement: 1.identifies surrounding source block; 2.identifies missing power source
+            if (blocksV1[y-1][x].getBlockType() != blocksV2[y-1][x].getBlockType()){
+                delta = true;
+            }
+        }
+        if (dirTest.includes("2") && blocksV2[y][x].getDirection().toString().includes("2")){
+            if ((blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
+                if (blocksV1[y][x+1].getWestPort().getRPower()-1 > rPowMax){
+                    rPowMax = blocksV1[y][x+1].getWestPort().getRPower()-1;
+                }
+            }
+            if (blocksV1[y][x+1].getBlockType() != blocksV2[y][x+1].getBlockType()){
+                delta = true;
+            }
+        }
+        if (dirTest.includes("3") && blocksV2[y][x].getDirection().toString().includes("3")){
+            if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
+                if (blocksV1[y+1][x].getNorthPort().getRPower()-1 > rPowMax){
+                    rPowMax = blocksV1[y+1][x].getNorthPort().getRPower()-1;
+                }
+            }
+            if (blocksV1[y+1][x].getBlockType() != blocksV2[y+1][x].getBlockType()){
+                delta = true;
+            }
+        }
+        if (dirTest.includes("4") && blocksV2[y][x].getDirection().toString().includes("4")){
+            if ((blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
+                if (blocksV1[y][x-1].getEastPort().getRPower()-1 > rPowMax){
+                    rPowMax = blocksV1[y][x-1].getEastPort().getRPower()-1;
+                }
+            }
+            if (blocksV1[y][x-1].getBlockType() != blocksV2[y][x-1].getBlockType()){
+                delta = true;
+            }
+        }
+
+        //maximum power output (with/without change)
+        if (delta) rPowMax = 0;
+        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowMax); 
+        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowMax);
+        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowMax);
+        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowMax);
+
+
+
+        //on/off establishment
+        if (rPowMax > 0){
+            blocksV2[y][x].setImgPower("on");
+        }
+        else {
+            blocksV2[y][x].setImgPower("off");
+        }
+    }
+    else {
+        //no ePower
+        blocksV2[y][x].getNorthPort().setEPower(false);
+        blocksV2[y][x].getEastPort().setEPower(false);
+        blocksV2[y][x].getSouthPort().setEPower(false);
+        blocksV2[y][x].getWestPort().setEPower(false);
+        
+        //turning "off" dust
+        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
+        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
+        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
+        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
+
+        //turns image off
+        blocksV2[y][x].setImgPower("off");
     }
 }
 
