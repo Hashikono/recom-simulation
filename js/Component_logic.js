@@ -1089,7 +1089,7 @@ function redstone_lamp_update(y,x){ //DONE
         //Max rPower establishment (applies to next 50 something lines of code)
         let powerr = false;
 
-        //SETTING OUTPUTS
+        /*SETTING OUTPUTS
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
         //North
         if (dirTest.includes("1")){
@@ -1177,7 +1177,7 @@ function redstone_lamp_update(y,x){ //DONE
         if (outputList.includes("2")) blocksV2[y][x].getEastPort().setIo("output");
         if (outputList.includes("3")) blocksV2[y][x].getSouthPort().setIo("output");
         if (outputList.includes("4")) blocksV2[y][x].getWestPort().setIo("output");
-        
+        */
 
 
         //SETSPOWERR
