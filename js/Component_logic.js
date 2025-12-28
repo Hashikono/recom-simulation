@@ -933,8 +933,40 @@ function redstone_dust_update(y,x){ //DONE
     if (ePowerTest(y,x)){
         //Max rPower establishment (applies to next 50 something lines of code)
         let rPowMax = 0;
-        //source change indicator
-        let delta = false;
+        //power source existence
+        let psExist = false;
+
+        //check every direction for valid power source
+        for (const direction of dirTest){
+            //direction irrelevance test
+            if (!blocksV2[y][x].getDirection().toString().includes(dir)) continue;
+
+            //storing neighboring/next/new values (yeah call it whatever you want)
+            let neighY = y;
+            let neighX = x;
+
+            switch(direction){
+                case "1": neighY = y-1; break;
+                case "2": neighX = x+1; break;
+                case "3": neighY = y+1; break;
+                case "4": neighX = x-1; break;
+            }
+
+            //checking neighboring blocks
+            const neighbor = blocksV1[neighY][neighX];
+            let powerProvision = false;
+            let neighborPower = 0;
+
+            //direction analysis (power provision/block type)
+            switch(direction){
+                case "1": 
+                    powerProvision = (neighbor.getSouthPort.getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
+                    neighborPower = neighbor.getSouthPort().getRPower();
+                    break;
+            }
+
+
+        }
 
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
         //North
@@ -1000,6 +1032,10 @@ function redstone_dust_update(y,x){ //DONE
             blocksV2[y][x].setImgPower("off");
         }
     }
+
+
+
+    
     else {
         //no ePower
         blocksV2[y][x].getNorthPort().setEPower(false);
@@ -1008,10 +1044,10 @@ function redstone_dust_update(y,x){ //DONE
         blocksV2[y][x].getWestPort().setEPower(false);
         
         //turning "off" dust
-        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
-        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
-        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
-        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
+        blocksV2[y][x].getNorthPort().setRPower(0); 
+        blocksV2[y][x].getEastPort().setRPower(0);
+        blocksV2[y][x].getSouthPort().setRPower(0);
+        blocksV2[y][x].getWestPort().setRPower(0);
 
         //turns image off
         blocksV2[y][x].setImgPower("off");
