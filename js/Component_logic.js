@@ -558,7 +558,6 @@ function successfulPath(neighY, neighX, y, x){
         let [cobbleY, cobbleX, fromY, fromX] = queue.shift();
 
         //cobblestone found
-        console.log("cobblestone place is undefined???", blocksV1[0]);
         if (blocksV1[cobbleY][cobbleX].getBlockType() == "cobblestone"){
             return true;
         }
@@ -1035,10 +1034,10 @@ function redstone_comparator_update(y,x){
 
 function redstone_lamp_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
+    let dirTest = edgeIdentifier(y,x);
     if (ePowerTest(y,x)){
         //Max rPower establishment (applies to next 50 something lines of code)
         let powerr = false;
-        let dirTest = edgeIdentifier(y,x);
 
         //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
         //North
@@ -1048,7 +1047,7 @@ function redstone_lamp_update(y,x){
                 powerr = true;
             }
             else if (
-                blocksV1[y-1][x].blockType() == "redstone_dust" && 
+                blocksV1[y-1][x].getBlockType() == "redstone_dust" && 
                 blocksV1[y-1][x].getDirection().toString().includes("3") && 
                 blocksV1[y-1][x].getSouthPort().getRPower() > 0
                 ){
@@ -1062,7 +1061,7 @@ function redstone_lamp_update(y,x){
                 powerr = true;
             }
             else if (
-                blocksV1[y][x+1].blockType() == "redstone_dust" && 
+                blocksV1[y][x+1].getBlockType() == "redstone_dust" && 
                 blocksV1[y][x+1].getDirection().toString().includes("4") && 
                 blocksV1[y][x+1].getWestPort().getRPower() > 0
                 ){
@@ -1076,7 +1075,7 @@ function redstone_lamp_update(y,x){
                 powerr = true;
             }
             else if (
-                blocksV1[y+1][x].blockType() == "redstone_dust" && 
+                blocksV1[y+1][x].getBlockType() == "redstone_dust" && 
                 blocksV1[y+1][x].getDirection().toString().includes("1") && 
                 blocksV1[y+1][x].getNorthPort().getRPower() > 0
                 ){
@@ -1090,7 +1089,7 @@ function redstone_lamp_update(y,x){
                 powerr = true;
             }
             else if (
-                blocksV1[y][x-1].blockType() == "redstone_dust" && 
+                blocksV1[y][x-1].getBlockType() == "redstone_dust" && 
                 blocksV1[y][x-1].getDirection().toString().includes("2") && 
                 blocksV1[y][x-1].getEastPort().getRPower() > 0
                 ){
@@ -1099,11 +1098,20 @@ function redstone_lamp_update(y,x){
         }
 
         //on/off establishment
+        console.log("powerrrrr value:", powerr);
         if (powerr){
             blocksV2[y][x].setImgPower("on");
+            if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(1); 
+            if (dirTest.includes("2")) blocksV2[y][x].getEastPort().setRPower(1);
+            if (dirTest.includes("3")) blocksV2[y][x].getSouthPort().setRPower(1);
+            if (dirTest.includes("4")) blocksV2[y][x].getWestPort().setRPower(1);
         }
         else {
             blocksV2[y][x].setImgPower("off");
+            if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
+            if (dirTest.includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
+            if (dirTest.includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
+            if (dirTest.includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
         }
     }
     else {
@@ -1114,10 +1122,10 @@ function redstone_lamp_update(y,x){
         blocksV2[y][x].getWestPort().setEPower(false);
         
         //turning off lamp
-        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
-        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
-        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
-        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
+        if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
+        if (dirTest.includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
+        if (dirTest.includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
+        if (dirTest.includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
 
         //turns image off
         blocksV2[y][x].setImgPower("off");
