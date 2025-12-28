@@ -509,10 +509,13 @@ function ePowerTest(y,x){
             let neighX = x;
             switch(direction){
                 case "1": neighY = y-1; break;
-                case "2": neighY = x+1; break;
+                case "2": neighX = x+1; break;
                 case "3": neighY = y+1; break;
-                case "4": neighY = x-1; break;
+                case "4": neighX = x-1; break;
             }
+
+            //coordinate validation
+            if (neighY < 0 || neighY >= 6 || neighX < 0 || neighX >= 6) continue;
 
             //connection checking
             const neighboring = blocksV1[neighY][neighX];
@@ -527,7 +530,7 @@ function ePowerTest(y,x){
                 }
                 //successful connection establishment
                 if (sConnect){
-                    if (successfulPath(neighY, neighX, y, x, visited)){
+                    if (successfulPath(neighY, neighX, y, x)){
                         power = true;
                         break;
                     }
@@ -545,69 +548,77 @@ function ePowerTest(y,x){
 }
 
 //ePowerTest path succession tester
-function successfulPath(neighY, neighX, y, x, visited){
+function successfulPath(neighY, neighX, y, x){
     //path finding :l
     let queue = [[neighY,neighX,y,x]];
     //avoiding duplicates in visitation
-    let localVisited = new Set([`${neighY}, ${neighX}`]);
+    let localVisited = new Set([`${neighY},${neighX}`]);
 
     while (queue.length > 0){
-        let cobbleY = queue.shift();
-        let cobbleX = queue.shift();
-        let fromY = queue.shift();
-        let fromX = queue.shift();
+        let [cobbleY, cobbleX, fromY, fromX] = queue.shift();
 
         //cobblestone found
+        console.log("cobblestone place is undefined???", blocksV1[0]);
         if (blocksV1[cobbleY][cobbleX].getBlockType() == "cobblestone"){
             return true;
         }
 
         //checking all (valid) directions
+        //North
         let dirTest = edgeIdentifier(cobbleY,cobbleX);
         if (dirTest.includes("1") && !(cobbleY-1 == fromY && cobbleX == fromX)){
             let newY = cobbleY-1;
             let newX = cobbleX;
             if (!localVisited.has(`${newY},${newX}`)) {
-                const neighbor = blocksV1[newY][newX];
-                if (neighbor.getBlockType() != "air" && neighbor.getSouthPort().getEPower()){
-                    queue.push([newY, newX, cobbleY, cobbleX]);
-                    localVisited.add(`${newY},${newX}`);
+                //check edge validity
+                if (newY >= 0 && newY < 6 && newX >= 0 && newX < 6){
+                    const neighbor = blocksV1[newY][newX];
+                    if (neighbor.getBlockType() != "air" && neighbor.getSouthPort().getEPower()){
+                        queue.push([newY, newX, cobbleY, cobbleX]);
+                        localVisited.add(`${newY},${newX}`);
+                    }
                 }
             }
         }
-
+        //East
         if (dirTest.includes("2") && !(cobbleY == fromY && cobbleX+1 == fromX)){
             let newY = cobbleY;
             let newX = cobbleX+1;
             if (!localVisited.has(`${newY},${newX}`)) {
-                const neighbor = blocksV1[newY][newX];
-                if (neighbor.getBlockType() != "air" && neighbor.getWestPort().getEPower()){
-                    queue.push([newY, newX, cobbleY, cobbleX]);
-                    localVisited.add(`${newY},${newX}`);
+                if (newY >= 0 && newY < 6 && newX >= 0 && newX < 6){
+                    const neighbor = blocksV1[newY][newX];
+                    if (neighbor.getBlockType() != "air" && neighbor.getWestPort().getEPower()){
+                        queue.push([newY, newX, cobbleY, cobbleX]);
+                        localVisited.add(`${newY},${newX}`);
+                    }
                 }
             }
         }
-
+        //South
         if (dirTest.includes("3") && !(cobbleY+1 == fromY && cobbleX == fromX)){
             let newY = cobbleY+1;
             let newX = cobbleX;
             if (!localVisited.has(`${newY},${newX}`)) {
-                const neighbor = blocksV1[newY][newX];
-                if (neighbor.getBlockType() != "air" && neighbor.getNorthPort().getEPower()){
-                    queue.push([newY, newX, cobbleY, cobbleX]);
-                    localVisited.add(`${newY},${newX}`);
+                if (newY >= 0 && newY < 6 && newX >= 0 && newX < 6){
+                    const neighbor = blocksV1[newY][newX];
+                    if (neighbor.getBlockType() != "air" && neighbor.getNorthPort().getEPower()){
+                        queue.push([newY, newX, cobbleY, cobbleX]);
+                        localVisited.add(`${newY},${newX}`);
+                    }
                 }
             }
         }
-
+        //West
         if (dirTest.includes("4") && !(cobbleY == fromY && cobbleX-1 == fromX)){
             let newY = cobbleY;
             let newX = cobbleX-1;
             if (!localVisited.has(`${newY},${newX}`)) {
-                const neighbor = blocksV1[newY][newX];
-                if (neighbor.getBlockType() != "air" && neighbor.getEastPort().getEPower()){
-                    queue.push([newY, newX, cobbleY, cobbleX]);
-                    localVisited.add(`${newY},${newX}`);
+                if (newY >= 0 && newY < 6 && newX >= 0 && newX < 6){
+                    const neighbor = blocksV1[newY][newX];
+                    if (neighbor.getBlockType() != "air" && neighbor.getEastPort().getEPower()){
+                        queue.push([newY, newX, cobbleY, cobbleX]);
+                        localVisited.add(`${newY},${newX}`);
+                    }
                 }
             }
         }
@@ -853,7 +864,7 @@ Block Ref: new Block(blockType(str), direction(int), state(int), imgPower(str), 
            get[dir]Port(obj) | powerTest(bool) | travelling/fixedPowerOutput(int)
            *setImg() & setImgPower() has no parameters | powerTest() requires parameter "e" or "r"
 
-Function Ref: genEmptyBlock() | genBlock(block,y,x) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval() | updateSurrounding(y,x) | successfulPath(neighY, neighX, y, x, visited)
+Function Ref: genEmptyBlock() | genBlock(block,y,x) | edgeIdentifier(y,x) | ePowertest(y,x) | selectionRemoval() | updateSurrounding(y,x) | successfulPath(neighY, neighX, y, x)
 
 Implementation Ref: update() | implement() | reset() | testAbsurdity(option)
 
