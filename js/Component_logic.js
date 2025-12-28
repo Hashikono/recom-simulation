@@ -1163,6 +1163,8 @@ function observer_update(y,x){ //DEPRECATED
 function cobblestone_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
     let dirTest = edgeIdentifier(y,x);
+    //track outputs
+    let outputList = ["1","2","3","4"];
     
     //Max rPower establishment
     let powerr = false;
@@ -1176,6 +1178,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y-1][x].getSouthPort().getIo() == "output" && 
             blocksV1[y-1][x].getSouthPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("1"),1);
             powerr = true;
         }
         else if (
@@ -1183,6 +1186,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y-1][x].getDirection().toString().includes("3") && 
             blocksV1[y-1][x].getSouthPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("1"),1);
             powerr = true;
         }
     }
@@ -1194,6 +1198,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y][x+1].getWestPort().getIo() == "output" && 
             blocksV1[y][x+1].getWestPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("2"),1);
             powerr = true;
         }
         else if (
@@ -1201,6 +1206,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y][x+1].getDirection().toString().includes("4") && 
             blocksV1[y][x+1].getWestPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("2"),1);
             powerr = true;
         }
     }
@@ -1212,6 +1218,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y+1][x].getNorthPort().getIo() == "output" && 
             blocksV1[y+1][x].getNorthPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("3"),1);
             powerr = true;
         }
         else if (
@@ -1219,6 +1226,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y+1][x].getDirection().toString().includes("1") && 
             blocksV1[y+1][x].getNorthPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("3"),1);
             powerr = true;
         }
     }
@@ -1230,6 +1238,7 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y][x-1].getEastPort().getIo() == "output" && 
             blocksV1[y][x-1].getEastPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("4"),1);
             powerr = true;
         }
         else if (
@@ -1237,9 +1246,16 @@ function cobblestone_update(y,x){ //DONE
             blocksV1[y][x-1].getDirection().toString().includes("2") && 
             blocksV1[y][x-1].getEastPort().getRPower() > 0
             ){
+            outputList.splice(outputList.indexOf("4"),1);
             powerr = true;
         }
     }
+
+    //sets outputs in output list as outputs
+    if (outputList.includes("1")) blocksV2[y][x].getNorthPort().setIo("output");
+    if (outputList.includes("2")) blocksV2[y][x].getEastPort().setIo("output");
+    if (outputList.includes("3")) blocksV2[y][x].getSouthPort().setIo("output");
+    if (outputList.includes("4")) blocksV2[y][x].getWestPort().setIo("output");
 
     //on/off establishment
     if (powerr){
