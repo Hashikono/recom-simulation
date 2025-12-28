@@ -1018,21 +1018,21 @@ function redstone_dust_update(y,x){ //DONE
     }
 }
 
-function redstone_repeator_update(y,x){
+function redstone_repeator_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function redstone_comparator_update(y,x){
+function redstone_comparator_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function redstone_lamp_update(y,x){
+function redstone_lamp_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
     let dirTest = edgeIdentifier(y,x);
     if (ePowerTest(y,x)){
@@ -1132,37 +1132,130 @@ function redstone_lamp_update(y,x){
     }
 }
 
-function oak_button_update(y,x){
+function oak_button_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function note_block_update(y,x){
+function note_block_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function lever_update(y,x){
+function lever_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function observer_update(y,x){
+function observer_update(y,x){ //DEPRECATED
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-//REVIEW Cobblestone not fully implemented
-function cobblestone_update(y,x){
+function cobblestone_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
+    let dirTest = edgeIdentifier(y,x);
+    
+    //Max rPower establishment
+    let powerr = false;
+
+    //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
+    //North
+    if (dirTest.includes("1")){
+        //regular output case
+        if (
+            blocksV1[y-1][x].getBlockType() != "redstone_block" && 
+            blocksV1[y-1][x].getSouthPort().getIo() == "output" && 
+            blocksV1[y-1][x].getSouthPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+        else if (
+            blocksV1[y-1][x].getBlockType() == "redstone_dust" && 
+            blocksV1[y-1][x].getDirection().toString().includes("3") && 
+            blocksV1[y-1][x].getSouthPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+    }
+    //East
+    if (dirTest.includes("2")){
+        //regular output case
+        if (
+            blocksV1[y][x+1].getBlockType() != "redstone_block" && 
+            blocksV1[y][x+1].getWestPort().getIo() == "output" && 
+            blocksV1[y][x+1].getWestPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+        else if (
+            blocksV1[y][x+1].getBlockType() == "redstone_dust" && 
+            blocksV1[y][x+1].getDirection().toString().includes("4") && 
+            blocksV1[y][x+1].getWestPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+    }
+    //South
+    if (dirTest.includes("3")){
+        //regular output case
+        if (
+            blocksV1[y+1][x].getBlockType() != "redstone_block" && 
+            blocksV1[y+1][x].getNorthPort().getIo() == "output" && 
+            blocksV1[y+1][x].getNorthPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+        else if (
+            blocksV1[y+1][x].getBlockType() == "redstone_dust" && 
+            blocksV1[y+1][x].getDirection().toString().includes("1") && 
+            blocksV1[y+1][x].getNorthPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+    }
+    //West
+    if (dirTest.includes("4")){
+        //regular output case
+        if (
+            blocksV1[y][x-1].getBlockType() != "redstone_block" && 
+            blocksV1[y][x-1].getEastPort().getIo() == "output" && 
+            blocksV1[y][x-1].getEastPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+        else if (
+            blocksV1[y][x-1].getBlockType() == "redstone_dust" && 
+            blocksV1[y][x-1].getDirection().toString().includes("2") && 
+            blocksV1[y][x-1].getEastPort().getRPower() > 0
+            ){
+            powerr = true;
+        }
+    }
+
+    //on/off establishment
+    if (powerr){
+        blocksV2[y][x].setImgPower("on");
+        if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(1); 
+        if (dirTest.includes("2")) blocksV2[y][x].getEastPort().setRPower(1);
+        if (dirTest.includes("3")) blocksV2[y][x].getSouthPort().setRPower(1);
+        if (dirTest.includes("4")) blocksV2[y][x].getWestPort().setRPower(1);
+    }
+    else {
+        blocksV2[y][x].setImgPower("off");
+        if (dirTest.includes("1")) blocksV2[y][x].getNorthPort().setRPower(0); 
+        if (dirTest.includes("2")) blocksV2[y][x].getEastPort().setRPower(0);
+        if (dirTest.includes("3")) blocksV2[y][x].getSouthPort().setRPower(0);
+        if (dirTest.includes("4")) blocksV2[y][x].getWestPort().setRPower(0);
+    }
 }
 
 
