@@ -952,6 +952,8 @@ function redstone_dust_update(y,x){ //DONE
                 case "4": neighX = x-1; break;
             }
 
+
+
             //checking neighboring blocks
             const neighbor = blocksV1[neighY][neighX];
             let powerProvision = false;
@@ -960,82 +962,59 @@ function redstone_dust_update(y,x){ //DONE
             //direction analysis (power provision/block type)
             switch(direction){
                 case "1": 
-                    powerProvision = (neighbor.getSouthPort.getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
+                    powerProvision = (neighbor.getSouthPort().getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
                     neighborPower = neighbor.getSouthPort().getRPower();
+                    break;
+                case "2": 
+                    powerProvision = (neighbor.getWestPort().getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
+                    neighborPower = neighbor.getWestPort().getRPower();
+                    break;
+                case "3": 
+                    powerProvision = (neighbor.getNorthPort().getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
+                    neighborPower = neighbor.getNorthPort().getRPower();
+                    break;
+                case "4": 
+                    powerProvision = (neighbor.getEastPort().getIo() == "output" || neighbor.getBlockType() == "redstone_dust");
+                    neighborPower = neighbor.getEastPort().getRPower();
                     break;
             }
 
-
-        }
-
-        //If statement checks: 1.check edges; 2.check direction relevance; 3.check if output/redstone dust
-        //North
-        if (dirTest.includes("1") && blocksV2[y][x].getDirection().toString().includes("1")){
-            if ((blocksV1[y-1][x].getSouthPort().getIo() == "output" || blocksV1[y-1][x].getBlockType() == "redstone_dust")){
-                if (blocksV1[y-1][x].getSouthPort().getRPower()-1 > rPowMax){
-                    rPowMax = blocksV1[y-1][x].getSouthPort().getRPower()-1;
+            //checks validity of power source
+            if (powerProvision && neighborPower > 0){
+                if (traceRedstoneSource(neighY, neighX, y, x, new Set())){
+                    psExist = true;
+                    //finding max power output
+                    if (neighborPower-1 > rPowMax){
+                        rPowMax = neighborPower - 1;
+                    }
                 }
             }
-            //checks for block type change
-            if (blocksV1[y-1][x].getBlockType() != blocksV2[y-1][x].getBlockType()){
-                delta = true;
-            }
-        }
-        //East
-        if (dirTest.includes("2") && blocksV2[y][x].getDirection().toString().includes("2")){
-            if ((blocksV1[y][x+1].getWestPort().getIo() == "output" || blocksV1[y][x+1].getBlockType() == "redstone_dust")){
-                if (blocksV1[y][x+1].getWestPort().getRPower()-1 > rPowMax){
-                    rPowMax = blocksV1[y][x+1].getWestPort().getRPower()-1;
-                }
-            }
-            if (blocksV1[y][x+1].getBlockType() != blocksV2[y][x+1].getBlockType()){
-                delta = true;
-            }
-        }
-        //South
-        if (dirTest.includes("3") && blocksV2[y][x].getDirection().toString().includes("3")){
-            if ((blocksV1[y+1][x].getNorthPort().getIo() == "output" || blocksV1[y+1][x].getBlockType() == "redstone_dust")){
-                if (blocksV1[y+1][x].getNorthPort().getRPower()-1 > rPowMax){
-                    rPowMax = blocksV1[y+1][x].getNorthPort().getRPower()-1;
-                }
-            }
-            if (blocksV1[y+1][x].getBlockType() != blocksV2[y+1][x].getBlockType()){
-                delta = true;
-            }
-        }
-        //West
-        if (dirTest.includes("4") && blocksV2[y][x].getDirection().toString().includes("4")){
-            if ((blocksV1[y][x-1].getEastPort().getIo() == "output" || blocksV1[y][x-1].getBlockType() == "redstone_dust")){
-                if (blocksV1[y][x-1].getEastPort().getRPower()-1 > rPowMax){
-                    rPowMax = blocksV1[y][x-1].getEastPort().getRPower()-1;
-                }
-            }
-            if (blocksV1[y][x-1].getBlockType() != blocksV2[y][x-1].getBlockType()){
-                delta = true;
-            }
         }
 
-        //maximum power output (with/without change)
-        if (delta) rPowMax = 0;
-        if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowMax); 
-        if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowMax);
-        if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowMax);
-        if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowMax);
-
-
-
-        //on/off establishment
-        if (rPowMax > 0){
-            blocksV2[y][x].setImgPower("on");
-        }
+        //setting corresponding port rPower if power source is valid
+        if (psExist){
+            if (blocksV2[y][x].getDirection().toString().includes("1")) blocksV2[y][x].getNorthPort().setRPower(rPowMax); 
+            if (blocksV2[y][x].getDirection().toString().includes("2")) blocksV2[y][x].getEastPort().setRPower(rPowMax);
+            if (blocksV2[y][x].getDirection().toString().includes("3")) blocksV2[y][x].getSouthPort().setRPower(rPowMax);
+            if (blocksV2[y][x].getDirection().toString().includes("4")) blocksV2[y][x].getWestPort().setRPower(rPowMax);
+        } 
         else {
+            //no valid power source
+            blocksV2[y][x].getNorthPort().setEPower(false);
+            blocksV2[y][x].getEastPort().setEPower(false);
+            blocksV2[y][x].getSouthPort().setEPower(false);
+            blocksV2[y][x].getWestPort().setEPower(false);
+            
+            //turning "off" dust
+            blocksV2[y][x].getNorthPort().setRPower(0); 
+            blocksV2[y][x].getEastPort().setRPower(0);
+            blocksV2[y][x].getSouthPort().setRPower(0);
+            blocksV2[y][x].getWestPort().setRPower(0);
+
+            //turns image off
             blocksV2[y][x].setImgPower("off");
         }
     }
-
-
-
-    
     else {
         //no ePower
         blocksV2[y][x].getNorthPort().setEPower(false);
@@ -1051,6 +1030,62 @@ function redstone_dust_update(y,x){ //DONE
 
         //turns image off
         blocksV2[y][x].setImgPower("off");
+    }
+
+    
+    //local redstone tracer function
+    function traceRedstoneSource(newY, newX, y, x, visited){
+        //recursion for visited blocks
+        const coor = `${newY},${newX}`;
+        if (visited.has(coor)) return false;
+        visited.add(coor);
+
+        //check if block is a power source
+        if (blocksV1[newY][newX].getBlockType() == "redstone_block" || (block.powerTest("r") && block.travellingPowerOutput() > 0)){
+            return true
+        }
+
+        //checking all directions
+        let dirTest = edgeIdentifier(newY,newX);
+        //North
+        if (dirTest.includes("1") && !(newY-1 == y && newX == x)){
+            const neighboring = blocksV1[newY-1][newX];
+            if (neighboring.getBlockType() != "air" && neighboring.getSouthPort().getRPower() > 0){
+                if (traceRedstoneSource(newY-1, newX, newY, newX, visited)){
+                    return true;
+                }
+            }
+        }
+        //East
+        if (dirTest.includes("2") && !(newY == y && newX+1 == x)){
+            const neighboring = blocksV1[newY][newX+1];
+            if (neighboring.getBlockType() != "air" && neighboring.getWestPort().getRPower() > 0){
+                if (traceRedstoneSource(newY, newX+1, newY, newX, visited)){
+                    return true;
+                }
+            }
+        }
+        //South
+        if (dirTest.includes("3") && !(newY+1 == y && newX == x)){
+            const neighboring = blocksV1[newY+1][newX];
+            if (neighboring.getBlockType() != "air" && neighboring.getNorthPort().getRPower() > 0){
+                if (traceRedstoneSource(newY+1, newX, newY, newX, visited)){
+                    return true;
+                }
+            }
+        }
+        //West
+        if (dirTest.includes("4") && !(newY == y && newX-1 == x)){
+            const neighboring = blocksV1[newY][newX-1];
+            if (neighboring.getBlockType() != "air" && neighboring.getEastPort().getRPower() > 0){
+                if (traceRedstoneSource(newY, newX-1, newY, newX, visited)){
+                    return true;
+                }
+            }
+        }
+
+        //if all else fails...
+        return false;
     }
 }
 
