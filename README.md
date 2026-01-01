@@ -36,6 +36,11 @@ You have **2** options:
 * To clear the grid, simply press the "Clear" button
 * To get rid of individual blocks, just click the "stone" block at the very end of the palette (stone = empty/air)
 
+* The following are in their experimental phase
+    * To **INTERACT** wth a block (changing repeator ticks, playing note blocks, etc.) click on the block using the **BOOK**
+    * To change a block's **DIRECTION** click on the block using the **STICK**
+        * Redstone dust direction cannot be changed because just like in the game, it assumes its own direction based on its surrounding blocks...
+
 ## Future Work
 * Addition of more blocks (the ones we deprecated)
 * Software implementation via micropython ([Hardware](https://github.com/FroggLeo/pcb-redstone?tab=readme-ov-file))

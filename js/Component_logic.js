@@ -468,13 +468,14 @@ function testAbsurdity(option){
 
 //updates surrounding blocks in blocksV2
 function updateSurrounding(y,x){
-    let dirTesting =edgeIdentifier(y,x);
+    let dirTesting = edgeIdentifier(y,x);
     //constructing surrounding blocks list
+    //REVIEW fix this
     let surBlock = ["air","air","air","air"];
     if(dirTesting.includes("1")){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
     if(dirTesting.includes("2")){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
     if(dirTesting.includes("3")){surBlock[2] = blocksV1[y+1][x].getBlockType(); }
-    if(dirTesting.includes("4")){surBlock[3] = blocksV1[y][x-1].getBlockType(); } 
+    if(dirTesting.includes("4")){surBlock[3] = blocksV1[y][x-1].getBlockType(); }
 
     blocksV2[y][x].getNorthPort().setConBlockType(surBlock[0]);
     blocksV2[y][x].getEastPort().setConBlockType(surBlock[1]);
