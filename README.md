@@ -17,7 +17,7 @@
 ## Installation Instructions
 You have **2** options:
 
-1. **Play on the Github site**
+1. **Run on the Github site**
     * Go to the Github page: https://hashikono.github.io/recom-simulation/recom_simulation.html
     * (See **Usage** below)
 
@@ -32,7 +32,7 @@ You have **2** options:
 * Click on any of the bottom placement grid cells to place your desired block (stone blocks)
 * To allow for the components to update, you must place a (battery) cobblestone block near or right next to the power-source block (Redstone Blocks are power-source blocks)
     * This is to simulate the presence of a battery/electrical power in the grid
-* <u>**IMPORTANT:**</u> The green totally unmissable "Update (spam)" button at the top acts like a stepper, if you want to update your grid fully you must **SPAM** the button!!!
+* <u>**IMPORTANT:**</u> The totally unmissable "Update (spam)" button at the top acts like a stepper, if you want to update your grid fully you must **SPAM** the button!!!
 * To clear the grid, simply press the "Clear" button
 * To get rid of individual blocks, just click the "stone" block at the very end of the palette (stone = empty/air)
 
