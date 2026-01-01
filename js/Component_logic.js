@@ -15,7 +15,7 @@ class Port { //ePow(bool), rPow(int), blockType(str), io(str), priority(bool)
 
     //clone method -_-
     clone() {
-        return new Port(this.ePow, this.rPow, this.onBlockType, this.io, this.priority);
+        return new Port(this.ePow, this.rPow, this.conBlockType, this.io, this.priority);
     }
 
     //get methods for port data
@@ -173,17 +173,6 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         }
     }
 
-    /*tests if the block has priority (outputs lists if it does) [deprecated due to exclusive use outside scope]
-    priorityTest(){
-        let dirPrior = [];
-        if (blocksV1[y-1][x]) dirPrior.push(1);
-        if (blocksV1[y][x+1]) dirPrior.push(2);
-        if (blocksV1[y+1][x]) dirPrior.push(3);
-        if (blocksV1[y][x-1]) dirPrior.push(4);
-
-        return dirPrior;
-    }*/
-
     //returns highest possible redstone power ouput value (minus one for spacing)
     travellingPowerOutput(){ //integer
         let max = 1;
@@ -206,15 +195,15 @@ class Block { //blockType(str), direction(int), state(int), imgPower(str), ports
         return max;
     }
 
-    //returns bool value if block has a priority port (mainly for redstone_dust)
-    /*priorityExistence(){ //boolean
-        let existence = false;
-        for (let i = 0; i < this.portsList.length; i++){
-            if (this.portsList[i].getPrior() == true){
-                existence = true;
-            }
-        }
-        return existence;
+    /*tests if the block has priority (outputs lists if it does) [deprecated due to exclusive use outside scope]
+    priorityTest(){
+        let dirPrior = [];
+        if (blocksV1[y-1][x]) dirPrior.push(1);
+        if (blocksV1[y][x+1]) dirPrior.push(2);
+        if (blocksV1[y+1][x]) dirPrior.push(3);
+        if (blocksV1[y][x-1]) dirPrior.push(4);
+
+        return dirPrior;
     }*/
 }
 
@@ -366,7 +355,7 @@ function genBlock(block,y,x){
                 new Port(true, 0, surBlock[3], "input", false)
             ]);
     }
-    //REVIEW (DEPRECATED) Add direction changer
+    //REVIEW Add direction changer
     else if (block == "stick"){
         if (blocksV1[y][x].getBlockType() == "redstone_repeator"){
 
@@ -380,7 +369,7 @@ function genBlock(block,y,x){
         //NOTE remove later:
         return new Block(block, 1234, 1, "off", "images/air_1234_1_off.png", [new Port(false, 0, surBlock[0], "none", false), new Port(false, 0, surBlock[1], "none", false), new Port(false, 0, surBlock[2], "none", false), new Port(false, 0, surBlock[3], "none", false)]);
     }
-    //REVIEW (DEPRECATED) Add interaction
+    //REVIEW Add interaction
     else if (block == "book"){
         if (blocksV1[y][x].getBlockType() == "redstone_repeator"){
 
@@ -422,7 +411,7 @@ function reset(){
 }
 
 //...
-//this function tests the character count of the blocksV1 object to see how absurd storing an entire web app's data in one variable is
+//this function tests the character count of the blocksV1 object declaration to see how absurd storing an entire web app's data in one variable is
 //Because there's no way to recover the original code of an object declaration, this prcedure finds the character count of an object's declaration assuming it was a newly declared list of new objects...
 function testAbsurdity(option){
     let organizedAbsurdText = JSON.stringify(blocksV1, null, 2);
@@ -441,18 +430,27 @@ function testAbsurdity(option){
     
     //1 = character count of declaration
     if (option = 1){
-        const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
-        let dynCharBlock = blocksV1.getBlockType().length + blocksV1.getDirection().toString().length + blocksV1.getState().toString().length + blocksV1.getImgPower().length + blocksV1.getImg().length;
-        
-        let dynCharNorth = blocksV1.getNorthPort().getEPower().toString().length + blocksV1.getNorthPort().getRPower().toString().length + blocksV1.getNorthPort().getConBlockType().length + blocksV1.getNorthPort().getIo().length + blocksV1.getNorthPort().getPrior().toString().length;
-        
-        let dynCharEast = blocksV1.getEastPort().getEPower().toString().length + blocksV1.getEastPort().getRPower().toString().length + blocksV1.getEastPort().getConBlockType().length + blocksV1.getEastPort().getIo().length + blocksV1.getEastPort().getPrior().toString().length; 
-        
-        let dynCharSouth = blocksV1.getSouthPort().getEPower().toString().length + blocksV1.getSouthPort().getRPower().toString().length + blocksV1.getSouthPort().getConBlockType().length + blocksV1.getSouthPort().getIo().length + blocksV1.getSouthPort().getPrior().toString().length;
-        
-        let dynCharWest = blocksV1.getWestPort().getEPower().toString().length + blocksV1.getWestPort().getRPower().toString().length + blocksV1.getWestPort().getConBlockType().length + blocksV1.getWestPort().getIo().length + blocksV1.getWestPort().getPrior().toString().length;
+        //object declaration character sum
+        let charSum = 0;
+        //sy/sx = special Y/X
+        for (let sy = 0; sy < 6; sy++){
+            for (let sx = 0; sx < 6; sx++){
+                const characters = `new Block("", , , "", "", [new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", ), new Port(, , "", "", )]);`;
+                let dynCharBlock = blocksV1[sy][sx].getBlockType().length + blocksV1[sy][sx].getDirection().toString().length + blocksV1[sy][sx].getState().toString().length + blocksV1[sy][sx].getImgPower().length + blocksV1[sy][sx].getImg().length;
+                
+                let dynCharNorth = blocksV1[sy][sx].getNorthPort().getEPower().toString().length + blocksV1[sy][sx].getNorthPort().getRPower().toString().length + blocksV1[sy][sx].getNorthPort().getConBlockType().length + blocksV1[sy][sx].getNorthPort().getIo().length + blocksV1[sy][sx].getNorthPort().getPrior().toString().length;
+                
+                let dynCharEast = blocksV1[sy][sx].getEastPort().getEPower().toString().length + blocksV1[sy][sx].getEastPort().getRPower().toString().length + blocksV1[sy][sx].getEastPort().getConBlockType().length + blocksV1[sy][sx].getEastPort().getIo().length + blocksV1[sy][sx].getEastPort().getPrior().toString().length; 
+                
+                let dynCharSouth = blocksV1[sy][sx].getSouthPort().getEPower().toString().length + blocksV1[sy][sx].getSouthPort().getRPower().toString().length + blocksV1[sy][sx].getSouthPort().getConBlockType().length + blocksV1[sy][sx].getSouthPort().getIo().length + blocksV1[sy][sx].getSouthPort().getPrior().toString().length;
+                
+                let dynCharWest = blocksV1[sy][sx].getWestPort().getEPower().toString().length + blocksV1[sy][sx].getWestPort().getRPower().toString().length + blocksV1[sy][sx].getWestPort().getConBlockType().length + blocksV1[sy][sx].getWestPort().getIo().length + blocksV1[sy][sx].getWestPort().getPrior().toString().length;
 
-        return characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
+                charSum += characters.length + dynCharBlock + dynCharNorth + dynCharEast + dynCharSouth + dynCharWest;
+            }
+        }
+
+        return charSum;
     } 
 
     //2 = one line JSON 
@@ -470,7 +468,6 @@ function testAbsurdity(option){
 function updateSurrounding(y,x){
     let dirTesting = edgeIdentifier(y,x);
     //constructing surrounding blocks list
-    //REVIEW fix this
     let surBlock = ["air","air","air","air"];
     if(dirTesting.includes("1")){surBlock[0] = blocksV1[y-1][x].getBlockType(); }
     if(dirTesting.includes("2")){surBlock[1] = blocksV1[y][x+1].getBlockType(); }
@@ -494,6 +491,7 @@ function edgeIdentifier(y,x){
 }
 
 //tests ePower on surrounding blocks
+//REVIEW Review tracing algorithm to look for redundancies
 function ePowerTest(y,x){
     let power = false;
 
@@ -661,6 +659,9 @@ function update(){
     blocksV1 = blocksV2.map(row => row.map(bloc => bloc.clone()));
     implement();
     console.log("blocksV1[0]:", blocksV1[0]);
+    //NOTE reactivate this only when needed (you can test most stuff with blocksV1[0])
+    //console.log("blocksV1[all]:", blocksV1);
+    console.log("test absurdity:", testAbsurdity(1));
 }   
 
 //Implements the blocks list into the grid (HTML creation)
@@ -791,7 +792,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
  //(∞) update function
- //REVIEW (DEPRECATED) Very buggy
+ //REVIEW Very buggy...
 var continuousUpdate = false;
 function wUpdate(){
     continuousUpdate = !continuousUpdate;
@@ -1067,20 +1068,21 @@ function redstone_dust_update(y,x){ //DONE
     }
 }
 
-function redstone_repeator_update(y,x){ //DEPRECATED
+function redstone_repeator_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function redstone_comparator_update(y,x){ //DEPRECATED
+function redstone_comparator_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
+//REVIEW Fix travelling stuff between regular blocks... (only need to worry about note blocks and other redstone lamps honestly)
 function redstone_lamp_update(y,x){ //DONE
     blocksV2[y][x] = blocksV1[y][x].clone();
     let dirTest = edgeIdentifier(y,x);
@@ -1274,28 +1276,28 @@ function redstone_lamp_update(y,x){ //DONE
     }
 }
 
-function oak_button_update(y,x){ //DEPRECATED
+function oak_button_update(y,x){
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function note_block_update(y,x){ //DEPRECATED
+function note_block_update(y,x){ //NEXT
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function lever_update(y,x){ //DEPRECATED
+function lever_update(y,x){ 
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
     }
 }
 
-function observer_update(y,x){ //DEPRECATED
+function observer_update(y,x){ 
     blocksV2[y][x] = blocksV1[y][x].clone();
     if (ePowerTest(y,x)){
         //
@@ -1436,7 +1438,7 @@ function updateStr(x,y,block){
     str[x][y] = block;
 }
 */
-/* DEPRECATED: priority check and calculations within the block object
+/* DEPRECATED: priority check and calculations within the block object - all calculations are outer now, not inner
 function test() {
     //list of output/port indexes
     let outputList = [];
@@ -1470,7 +1472,7 @@ function test() {
 }
 */
 
-
+//REVIEW UPDATE NOTES AND BLOCK STRUCTURE DIAGRAM
 /*
 //SECTION API
 -----------------------------------------------------------------------------------------
